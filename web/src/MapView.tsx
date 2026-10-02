@@ -140,7 +140,10 @@ export default function MapView({ data, scenario, year, values, breaks, selectio
       map.on("mouseout", () => setHover(null));
       setReady(true);
     });
-    return () => map.remove();
+    return () => {
+      mapRef.current = null; // lets other effects' cleanups see the map is gone
+      map.remove();
+    };
   }, []);
 
   // Shade postcodes with the selected scenario-year values.
@@ -190,7 +193,8 @@ export default function MapView({ data, scenario, year, values, breaks, selectio
     if (!ready || !map || !selectedPoa) return;
     map.setFeatureState({ source: "poa", id: selectedPoa }, { selected: true });
     return () => {
-      map.setFeatureState({ source: "poa", id: selectedPoa }, { selected: false });
+      // On unmount the map may already be removed; only clear the outline on a live map.
+      if (mapRef.current === map) map.setFeatureState({ source: "poa", id: selectedPoa }, { selected: false });
     };
   }, [ready, selectedPoa]);
 
