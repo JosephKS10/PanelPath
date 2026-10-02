@@ -18,7 +18,7 @@ Work through the steps in order. Each step lists what to build, what it writes, 
 - [x] 9 Map MVP
 - [x] 10 Validation and method pages
 - [x] 11 Materials layer (stretch)
-- [ ] 12 Polish and submission
+- [ ] 12 Polish and submission (deploying to GitHub Pages; tick once the live site and the fresh-clone check pass)
 
 ## Step 0: Scaffold (30 min)
 

@@ -6,7 +6,7 @@ PanelPath forecasts end-of-life solar panels postcode by postcode, measures how 
 
 ![PanelPath map: panel waste per km² by postcode in 2030, with 100 optimised collection sites](outputs/figures/app_map.png)
 
-**Live site:** not deployed yet (TODO). The static build runs locally in a minute; see [Run it](#run-it).
+**Live site:** https://josephks10.github.io/PanelPath/ (built and published by `.github/workflows/pages.yml` on every push to `main`).
 
 ## The problem
 

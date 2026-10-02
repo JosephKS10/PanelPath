@@ -12,7 +12,7 @@ About 290 spoken words, at roughly 145 words a minute. Record the browser at 136
 
 ## Recording checklist
 
-- Start the site with `cd web && npm run dev`, or open the deployed link.
+- Open https://josephks10.github.io/PanelPath/, or run `cd web && npm run dev`.
 - Wait for the map tiles to load before you start recording.
 - Run the play animation once beforehand, so the tiles are cached and the wave plays smoothly.
 - Keep the cursor still while you talk, and move it only when you click.
