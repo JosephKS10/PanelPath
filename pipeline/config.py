@@ -43,6 +43,9 @@ DOWNLOADS = {
     # "Waste_Management_Facilities_2025", newer than the 2022 update cited in CONTEXT [17]. GeoJSON + field defs PDF.
     "ga_waste_facilities.geojson": _GA + "147594_00_1.json",
     "ga_waste_facilities_metadata.pdf": _GA + "147594_04_3.pdf",
+    # IRENA and IEA-PVPS 2016 [13]: c-Si panel composition and silver content/value for the materials layer.
+    "irena_ieapvps_end_of_life_pv_2016.pdf":
+        "https://www.irena.org/-/media/Files/IRENA/Agency/Publication/2016/IRENA_IEAPVPS_End-of-Life_Solar_PV_Panels_2016.pdf",
 }
 
 # --- Data sources and licences, checked 2026-10-03 on each publisher's copyright page or product readme ----------
@@ -189,6 +192,17 @@ SITE_YEARS = (2026, 2035)  # inclusive; per-site tonnes and panels reported for 
 # recommends. Excluded: soft-plastics bins, container deposit depots, MRFs, reprocessors, inert landfills.
 CANDIDATE_TYPES = ("TRANSFER STATION", "LANDFILL – PUTRESCIBLE", "E-WASTE DROP-OFF FACILITY",
                    "E-WASTE RECYCLING FACILITY")
+
+# --- Materials layer (stretch), §6.6 --------------------------------------------------
+# c-Si panel composition by mass, IRENA/IEA-PVPS 2016 [13] p.41: "about 76% glass, 10% polymer, 8% aluminium,
+# 5% silicon, 1% copper and less than 0.1% silver and other metals". CONTEXT points to [21], a ResearchGate table
+# citing this report; [21] returned HTTP 403 (CAPTCHA) on 2026-10-03, so the primary source is used directly.
+# Assumes every panel is crystalline silicon (thin film is a negligible share of Australian rooftops; TODO: verify).
+MATERIAL_SHARES = {"glass": 0.76, "polymer": 0.10, "aluminium": 0.08, "silicon": 0.05, "copper": 0.01}
+SILVER_G_PER_PANEL = (6.0, 10.0)  # "a typical c-Si panel contains about 6-10 grammes of silver", [13] Box 22 p.78
+SILVER_MASS_SHARE_TEXT = "less than 0.1%"  # [13] p.41, quoted rather than a point value
+SILVER_VALUE_SHARE = 0.47  # silver's share of a c-Si panel's material value, [13] Figure 24 p.78
+MATERIALS_SOURCE = "IRENA and IEA-PVPS 2016, End-of-Life Management: Solar PV Panels, pp. 41 and 78 [13]"
 
 # --- Web data budget (CLAUDE.md code style) -------------------------------------
 WEB_DATA_MAX_MB = 15.0

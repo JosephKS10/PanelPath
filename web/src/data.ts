@@ -88,6 +88,20 @@ export interface FitReport {
   poas: { poa_code: string[]; excess: number[]; modelled: number[] };
 }
 
+/** Materials in panels retiring over `years`; arrays follow `keys` (tonnes per material, then silver kg low/high). */
+export interface Materials {
+  years: [number, number];
+  source: string;
+  shares: Record<string, number>;
+  silver_g_per_panel: [number, number];
+  silver_mass_share: string;
+  silver_value_share: number;
+  keys: string[];
+  national: Record<Scenario, number[]>;
+  poa: Record<Scenario, Record<string, number[]>>;
+  sites: Record<Scenario, Record<string, number[]>>;
+}
+
 /** scenario -> year -> poa_code -> tonnes; a missing postcode means 0. */
 export type Retirements = Record<Scenario, Record<string, Record<string, number>>>;
 
@@ -102,6 +116,7 @@ export interface Data {
   assumptions: Assumptions;
   validation: Validation;
   fit: FitReport;
+  materials: Materials;
 }
 
 async function get<T>(name: string): Promise<T> {
@@ -111,7 +126,7 @@ async function get<T>(name: string): Promise<T> {
 }
 
 export async function loadData(): Promise<Data> {
-  const [poa, retirements, coverage, cohorts, assumptions, validation, fit, ...sites] = await Promise.all([
+  const [poa, retirements, coverage, cohorts, assumptions, validation, fit, materials, ...sites] = await Promise.all([
     get<Data["poa"]>("poa.geojson"),
     get<Retirements>("retirements.json"),
     get<Coverage>("coverage.json"),
@@ -119,6 +134,7 @@ export async function loadData(): Promise<Data> {
     get<Assumptions>("assumptions.json"),
     get<Validation>("validation.json"),
     get<FitReport>("fit_report.json"),
+    get<Materials>("materials.json"),
     ...SCENARIOS.map((s) => get<Sites>(`sites_${s}.geojson`)),
   ] as const);
   return {
@@ -130,6 +146,7 @@ export async function loadData(): Promise<Data> {
     assumptions: assumptions as Assumptions,
     validation: validation as Validation,
     fit: fit as FitReport,
+    materials: materials as Materials,
     sites: Object.fromEntries(SCENARIOS.map((s, i) => [s, sites[i] as Sites])) as Record<Scenario, Sites>,
   };
 }

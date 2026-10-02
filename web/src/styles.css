@@ -94,6 +94,16 @@ footer { margin-top: auto; font-size: 11px; color: var(--muted); line-height: 1.
 .collected { font-size: 12.5px; color: var(--text-2); }
 .link { border: 0; background: none; padding: 0; color: var(--accent); text-decoration: underline; text-align: left; }
 
+.mine { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; background: #fff; }
+.mine-title { font-size: 12.5px; font-weight: 600; margin-bottom: 4px; }
+.mine table { width: 100%; border-collapse: collapse; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.mine td { padding: 2px 0; }
+.mine td:last-child { text-align: right; font-weight: 600; }
+.mine tr.silver td { color: #6b5d00; }
+.silver-compare { display: grid; gap: 6px; margin-top: 8px; font-size: 12px; color: var(--text-2); }
+.silver-compare .bar { display: block; height: 8px; background: var(--surface-2); border-radius: 4px; overflow: hidden; margin-bottom: 2px; }
+.silver-compare .bar i { display: block; height: 100%; min-width: 2px; background: #8a8a85; border-radius: 4px; }
+.mine .note { font-size: 11px; color: var(--muted); margin-top: 6px; }
 .chart figcaption { font-size: 12.5px; font-weight: 600; }
 .chart .readout { font-size: 12px; color: var(--text-2); min-height: 16px; font-variant-numeric: tabular-nums; }
 .chart svg { width: 100%; height: auto; display: block; margin-top: 2px; }

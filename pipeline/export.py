@@ -5,9 +5,12 @@ import shutil
 import pandas as pd
 
 from pipeline.config import (CANDIDATE_TYPES, COVERAGE_RADIUS_KM, DATA_SOURCES, DEFAULT_SCENARIO, DEMAND_YEARS,
-                             FIT_MAX_MEAN_KW, FIT_MIN_HOUSES, FORECAST_YEARS, INTERIM, MIN_SITES_PER_STATE, N_SITES,
+                             FIT_MAX_MEAN_KW, FIT_MIN_HOUSES, FORECAST_YEARS, INTERIM, MATERIAL_SHARES,
+                             MATERIALS_SOURCE, MIN_SITES_PER_STATE, N_SITES, SILVER_G_PER_PANEL, SILVER_MASS_SHARE_TEXT,
+                             SILVER_VALUE_SHARE, SITE_YEARS,
                              PANEL_TABLE, PANEL_TABLE_SOURCE, POA_GEOJSON_MAX_MB, PROCESSED, PROVISIONAL_MONTHS, QA,
                              REFERENCES, WEB_DATA, WEB_DATA_MAX_MB)
+from pipeline.materials import KEYS, split
 from pipeline.retirement import scenario_params
 
 
@@ -62,6 +65,25 @@ def assumptions_json() -> dict:
     }
 
 
+def materials_json(ret: pd.DataFrame) -> dict:
+    """Materials in panels retiring over SITE_YEARS, per scenario: national, per postcode and per chosen site."""
+    window = ret[ret["year"].between(*SITE_YEARS)]
+    rnd = lambda xs: [round(x, 1) for x in xs]
+    out = {"years": list(SITE_YEARS), "source": MATERIALS_SOURCE, "shares": MATERIAL_SHARES,
+           "silver_g_per_panel": list(SILVER_G_PER_PANEL), "silver_mass_share": SILVER_MASS_SHARE_TEXT,
+           "silver_value_share": SILVER_VALUE_SHARE, "keys": KEYS, "national": {}, "poa": {}, "sites": {}}
+    for scen, g in window.groupby("scenario"):
+        by_poa = g.groupby("poa_code")[["tonnes", "panels"]].sum()
+        out["national"][scen] = rnd(split(by_poa["tonnes"].sum(), by_poa["panels"].sum()))
+        out["poa"][scen] = {p: rnd(split(t, n)) for p, t, n in zip(by_poa.index, by_poa["tonnes"], by_poa["panels"])}
+        sites_file = PROCESSED / f"sites_{scen}.geojson"
+        if sites_file.exists():
+            feats = json.loads(sites_file.read_text())["features"]
+            out["sites"][scen] = {f["properties"]["id"]: rnd(split(sum(f["properties"]["tonnes"]),
+                                                                  sum(f["properties"]["panels"]))) for f in feats}
+    return out
+
+
 def qa_json() -> dict:
     """Data-quality figures quoted on the method page (limitations)."""
     cer = pd.read_parquet(INTERIM / "cer_installs.parquet")
@@ -85,6 +107,7 @@ def run() -> None:
     poa = pd.read_parquet(INTERIM / "poa.parquet")
     _write("retirements.json", retirements_json(pd.read_parquet(PROCESSED / "retirements.parquet")))
     _write("cohorts.json", cohorts_json(pd.read_parquet(INTERIM / "cohorts.parquet"), poa))
+    _write("materials.json", materials_json(pd.read_parquet(PROCESSED / "retirements.parquet")))
     (WEB_DATA / "assumptions.json").write_text(json.dumps(assumptions_json(), indent=2, ensure_ascii=False, allow_nan=False) + "\n")
 
     sizes = {p.name: p.stat().st_size / 1e6 for p in sorted(WEB_DATA.iterdir()) if p.is_file()}

@@ -53,6 +53,7 @@ function PoaDetails({ data, scenario, year, code, onSelect }:
       </p>
       <BarChart title="Panel waste retiring each year" unit="t" years={years} values={tonnes} color={RAMP[4]}
         highlight={year} />
+      <UrbanMine data={data} values={data.materials.poa[scenario][code]} />
       <BarChart title="Solar systems installed each year" unit="systems" years={data.cohorts.years} values={installs}
         color="#7a7975" faintFrom={provisionalYear}
         note={`From ${data.cohorts.provisional_from} registrations are still arriving, so recent years are incomplete.`} />
@@ -79,7 +80,40 @@ function SiteDetails({ data, scenario, year, id }: { data: Data; scenario: Scena
       </dl>
       <BarChart title="Panel waste reaching this site" unit="t" years={sites.years} values={site.tonnes}
         color={SITE_COLOR} highlight={year} extra={{ label: "panels", values: site.panels }} />
+      <UrbanMine data={data} values={data.materials.sites[scenario]?.[site.id]} />
     </>
+  );
+}
+
+const MATERIAL_LABEL: Record<string, string> = {
+  glass: "Glass", polymer: "Polymer", aluminium: "Aluminium", silicon: "Silicon", copper: "Copper",
+};
+
+/** Recoverable materials in panels retiring over the materials window, and silver's mass vs value share. */
+function UrbanMine({ data, values }: { data: Data; values?: number[] }) {
+  const m = data.materials;
+  if (!values) return null;
+  const [y0, y1] = m.years;
+  const silver = [values[m.keys.indexOf("silver_kg_low")], values[m.keys.indexOf("silver_kg_high")]];
+  const metals = Object.keys(m.shares);
+  return (
+    <section className="mine">
+      <p className="mine-title">Rooftop urban mine, {y0}–{y1}</p>
+      <table>
+        <tbody>
+          {metals.map((k) => (
+            <tr key={k}><td>{MATERIAL_LABEL[k] ?? k}</td><td>{fmtT(values[m.keys.indexOf(k)])} t</td></tr>
+          ))}
+          <tr className="silver"><td>Silver</td><td>{fmt(silver[0])}–{fmt(silver[1])} kg</td></tr>
+        </tbody>
+      </table>
+      <div className="silver-compare" aria-label="Silver share of panel mass against share of material value">
+        <div><span className="bar"><i style={{ width: "0.1%" }} /></span>Silver is {m.silver_mass_share} of panel mass</div>
+        <div><span className="bar"><i style={{ width: `${100 * m.silver_value_share}%` }} /></span>
+          but {fmt(100 * m.silver_value_share)}% of its material value</div>
+      </div>
+      <p className="note">Composition and silver from IRENA and IEA-PVPS (2016), assuming crystalline-silicon panels.</p>
+    </section>
   );
 }
 

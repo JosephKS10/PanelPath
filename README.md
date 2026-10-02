@@ -27,7 +27,7 @@ Where a postcode has more solar installs than houses, the excess is mostly repla
 
 ## Web data
 
-`python -m pipeline.run --stage export` writes these files to `web/public/data/` (6.8 MB in total; the budget is 15 MB). Postcodes are 4-character strings with leading zeros, years are calendar years, and tonnes are metric tonnes.
+`python -m pipeline.run --stage export` writes these files to `web/public/data/` (7.4 MB in total; the budget is 15 MB). Postcodes are 4-character strings with leading zeros, years are calendar years, and tonnes are metric tonnes.
 
 | File | Contents |
 |---|---|
@@ -38,4 +38,5 @@ Where a postcode has more solar installs than houses, the excess is mostly repla
 | `validation.json` | `targets` (reported figures with sources), and `scenarios`, which holds each target's model value and ratio plus `mean_abs_log_ratio`. Also `closest`, and `series`, which gives `years`, `tonnes` and `cumulative_tonnes` per scenario. |
 | `fit_report.json` | The lifetime fit: `beta`, `alpha`, `n_poas`, `rmse`, `f15`, `cutoff`, `states`, `filters` and `grid` (β against RMSE). Also `sensitivity` (one row per run), `cross_check` (replacement share of installs by state and year) and `poas`, which gives the observed and modelled excess per fitted postal area. |
 | `cohorts.json` | `years` (install years, 2001 to 2026), `provisional_from` (the first provisional month), `installs` (`{poa_code: [installs per year]}`) and `houses` (`{poa_code: occupied separate houses, Census 2021}`). |
+| `materials.json` | Recoverable materials in panels retiring 2026 to 2035. `keys` gives the array order: tonnes of glass, polymer, aluminium, silicon and copper, then silver in kg (low, high). Also holds `national`, `poa` and `sites` per scenario, plus `shares`, `silver_g_per_panel`, `silver_mass_share`, `silver_value_share` and `source` (IRENA and IEA-PVPS 2016, pp. 41 and 78). |
 | `assumptions.json` | `scenarios` (β, α, source), `default_scenario`, `panel_table` (watts, kg per panel and kg per kW by install year, with source), `settings`, `data_sources` (publisher, URL, licence, attribution) and `references` (the numbered works cited). |

@@ -58,5 +58,11 @@
     "download_date": "2026-10-03",
     "sha256": "965c01a0cdcb237a63c3df5bbdf9a36ef3dc7c78af9daaec790a3954bbe47985",
     "bytes": 146000
+  },
+  "irena_ieapvps_end_of_life_pv_2016.pdf": {
+    "url": "https://www.irena.org/-/media/Files/IRENA/Agency/Publication/2016/IRENA_IEAPVPS_End-of-Life_Solar_PV_Panels_2016.pdf",
+    "download_date": "2026-10-03",
+    "sha256": "744b0ad8f971374d89542a99cc7a3a3fe4b51bced22147f0ad396048152ee43d",
+    "bytes": 4927003
   }
 }

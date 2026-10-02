@@ -222,6 +222,26 @@ export function MethodPage({ data }: { data: Data }) {
         </table>
       </div>
       <p className="note">{a.panel_table.source.replace(/\s*\[\d+\]/g, "")} <Refs source={a.panel_table.source} data={data} /></p>
+      <h3>Panel materials</h3>
+      <div className="table-wrap">
+        <table className="data-table">
+          <thead><tr><th>Material</th><th>Share of panel mass</th></tr></thead>
+          <tbody>
+            {Object.entries(data.materials.shares).map(([k, v]) => (
+              <tr key={k}><td>{k[0].toUpperCase() + k.slice(1)}</td><td>{pct(v)}</td></tr>
+            ))}
+            <tr><td>Silver</td><td>{data.materials.silver_mass_share} ({data.materials.silver_g_per_panel.join("–")} g per panel)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p className="note">
+        Silver is {pct(data.materials.silver_value_share)} of a panel's material value. Under {a.default_scenario}, panels
+        retiring {data.materials.years.join("–")} hold about {(() => {
+          const n = data.materials.national[a.default_scenario], k = data.materials.keys;
+          const t = (key: string) => `${fmt(n[k.indexOf(key)] / 1000)} kt of ${key}`;
+          return `${t("glass")}, ${t("aluminium")}, ${t("silicon")} and ${t("copper")}, plus ${fmt(n[k.indexOf("silver_kg_low")] / 1000)}–${fmt(n[k.indexOf("silver_kg_high")] / 1000)} t of silver`;
+        })()}. {data.materials.source.replace(/\s*\[\d+\]/g, "")} <Refs source={data.materials.source} data={data} />
+      </p>
       <h3>Settings</h3>
       <div className="table-wrap">
         <table className="data-table">
