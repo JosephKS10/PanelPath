@@ -49,6 +49,23 @@ DOWNLOADS = {
 CRS_STORE = "EPSG:4326"  # storage
 CRS_METRIC = "EPSG:3577"  # GDA94 / Australian Albers, metres, for distances and areas
 
+# --- Geography and dwellings, BUILD_PLAN step 3 ---------------------------------
+STATE_ABBR = {"1": "NSW", "2": "VIC", "3": "QLD", "4": "SA", "5": "WA", "6": "TAS", "7": "NT", "8": "ACT",
+              "9": "OT"}  # ABS STE_CODE21 -> standard abbreviation; OT = Other Territories
+# POAs crossing state borders, allocated by ABS by population rather than area (Census DataPack
+# Readme/2021POA_readme.txt). Largest-area overlap gets 4 of these wrong, e.g. 2611 (Weston Creek, ACT) -> NSW.
+POA_STATE_OVERRIDES = {"0872": "NT", "2540": "NSW", "2611": "ACT", "2620": "NSW", "2618": "ACT", "2406": "NSW",
+                       "3707": "VIC", "3691": "VIC", "3644": "VIC", "4375": "QLD", "4377": "QLD", "4380": "QLD",
+                       "4383": "QLD", "4385": "QLD", "4825": "QLD"}
+# Greater Capital City Statistical Areas (ABS GCC_CODE21). The ACT (8ACTE) stands in for Canberra.
+CAPITAL_GCCSA = ["1GSYD", "2GMEL", "3GBRI", "4GADE", "5GPER", "6GHOB", "7GDAR", "8ACTE"]
+# Census 2021 GCP table G36 "Dwelling Structure", occupied private dwellings (Metadata_2021_GCP_DataPack_R1_R2.xlsx).
+CENSUS_G36 = "2021 Census GCP Postal Areas for AUS/2021Census_G36_AUST_POA.csv"
+CENSUS_HOUSES_COL = "OPDs_Separate_house_Dwellings"  # separate houses: default fit denominator, §6.4
+CENSUS_SEMIS_COL = "OPDs_SD_r_t_h_th_Tot_Dwgs"  # semi-detached, row or terrace, townhouse: sensitivity, §6.4
+POA_SIMPLIFY_M = 500  # web polygon simplification tolerance; 500 m gives ~4.2 MB, under POA_GEOJSON_MAX_MB
+GEOJSON_DECIMALS = 4  # ~11 m at Australian latitudes, well below the simplification tolerance
+
 # --- Retirement curve F(t) = 1 - exp(-(t/beta)^alpha), §6.3 -------------------
 SCENARIOS = {
     "AU_RES": {"beta": 17.0, "alpha": 2.4928},  # UNSW, Tan et al. 2022, Australian residential [11]

@@ -9,7 +9,7 @@ Work through the steps in order. Each step lists what to build, what it writes, 
 - [x] 0 Scaffold
 - [x] 1 Download
 - [x] 2 Clean CER data
-- [ ] 3 Geography and dwellings
+- [x] 3 Geography and dwellings
 - [ ] 4 Cohorts, tonnes and retirements
 - [ ] 5 National validation
 - [ ] 6 Lifetime fit (the creative twist)
