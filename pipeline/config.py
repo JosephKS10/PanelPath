@@ -1,0 +1,76 @@
+"""Every modelling assumption, with its source. Section and [n] refs point to docs/CONTEXT.md."""
+from datetime import date
+from pathlib import Path
+
+# --- Paths -----------------------------------------------------------------
+ROOT = Path(__file__).resolve().parent.parent
+RAW = ROOT / "data" / "raw"
+INTERIM = ROOT / "data" / "interim"
+PROCESSED = ROOT / "data" / "processed"
+QA = PROCESSED / "qa"
+FIGURES = ROOT / "outputs" / "figures"
+WEB_DATA = ROOT / "web" / "public" / "data"
+MANIFEST = RAW / "MANIFEST.json"
+
+# --- Source landing pages (§13). Direct file URLs are found on these pages in step 1. ---
+SOURCE_PAGES = {
+    "cer_postcode": "https://cer.gov.au/markets/reports-and-data/small-scale-installation-postcode-data",  # [14]
+    "abs_asgs": "https://www.abs.gov.au/statistics/standards/australian-statistical-geography-standard-asgs-edition-3/jul2021-jun2026/access-and-downloads/digital-boundary-files",  # [15]
+    "abs_datapacks": "https://www.abs.gov.au/census/find-census-data/datapacks",  # [16]
+    "ga_waste_ecat": "https://ecat.ga.gov.au/geonetwork/srv/api/records/495820b9-4a56-4409-9d1b-950589b50936",  # [17]
+    "ga_waste_atlas": "https://digital.atlas.gov.au/datasets/waste-management-facilities-1",  # [18]
+}
+
+# --- Coordinate systems (CLAUDE.md modelling rules) ---------------------------
+CRS_STORE = "EPSG:4326"  # storage
+CRS_METRIC = "EPSG:3577"  # GDA94 / Australian Albers, metres, for distances and areas
+
+# --- Retirement curve F(t) = 1 - exp(-(t/beta)^alpha), §6.3 -------------------
+SCENARIOS = {
+    "AU_RES": {"beta": 17.0, "alpha": 2.4928},  # UNSW, Tan et al. 2022, Australian residential [11]
+    "INTL_EARLY": {"beta": 30.0, "alpha": 2.4928},  # IRENA/IEA-PVPS 2016, early loss [13]
+    "INTL_REGULAR": {"beta": 30.0, "alpha": 5.3759},  # IRENA/IEA-PVPS 2016, regular loss [13]
+    "FITTED": {"beta": None, "alpha": 2.4928},  # beta fitted in step 6 (§6.4); alpha from [11]
+}
+FALLBACK_SCENARIO = "AU_RES"  # used where FITTED is not available yet, §6.5
+
+# --- Panel watts and mass by install year, §7 ---------------------------------
+# (last install year inclusive, watts per panel, kg per panel). Starting estimates
+# anchored on 58-65 t/MW for 2018-era panels [22]. TODO: verify each row.
+# kg per kW = kg per panel * 1000 / watts -> 91, 84, 80, 73, 70, 62, 58, 54, 50, 49.
+PANEL_TABLE = [
+    (2008, 170, 15.5),
+    (2010, 185, 15.5),
+    (2012, 200, 16.0),
+    (2014, 240, 17.5),
+    (2016, 265, 18.5),
+    (2018, 300, 18.5),
+    (2020, 330, 19.0),
+    (2022, 390, 21.0),
+    (2024, 430, 21.5),
+    (9999, 450, 22.0),  # 2025 onward
+]
+
+# --- Forecast years, §7 -------------------------------------------------------
+FORECAST_YEARS = (2015, 2035)  # inclusive
+DEMAND_YEARS = (2026, 2030)  # inclusive; tonnes in this window weight the optimiser demand
+PROVISIONAL_MONTHS = 12  # recent CER months are incomplete (late registrations), §6.4 caveats
+
+# --- Lifetime fit, §6.4 and §7 --------------------------------------------------
+FIT_CUTOFF = date(2021, 8, 10)  # Census night 2021
+FIT_BETA_GRID = (10.0, 35.0, 0.25)  # start, stop (inclusive), step
+FIT_MIN_HOUSES = 500
+FIT_MAX_MEAN_KW = 15.0  # drop business-heavy POAs above this mean system size
+FIT_MEAN_KW_YEARS = (2016, 2021)  # window for the mean system size filter
+FIT_SENSITIVITY_MAX_MEAN_KW = (10.0, 20.0)  # BUILD_PLAN step 6
+
+# --- Site optimiser, §6.5 and §7 ------------------------------------------------
+COVERAGE_RADIUS_KM = 30.0
+N_SITES = 100  # pilot target of about 100 sites [6]
+MIN_SITES_PER_STATE = 2
+SITE_DEDUPE_M = 100.0  # merge candidate facilities closer than this, BUILD_PLAN step 7
+EXACT_SOLVER_TIME_LIMIT_S = 120
+
+# --- Web data budget (CLAUDE.md code style) -------------------------------------
+WEB_DATA_MAX_MB = 15.0
+POA_GEOJSON_MAX_MB = 5.0
