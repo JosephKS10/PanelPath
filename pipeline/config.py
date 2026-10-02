@@ -82,6 +82,10 @@ REFERENCES = {
     20: ("EU Climate Dialogues, PV Circularity Policy Recommendations (Overview), 2024",
          "https://www.eeas.europa.eu/sites/default/files/documents/2024/23039%20-%20GIZ%20Solar%20PV%20Circularity%20Report%20Overview.pdf"),
     22: ("Panel mass per MW estimate", "https://freeingenergy.com/math/solar-panel-module-retired-waste-landfill-m134/"),
+    23: ("Optimised PV waste collection network for South Australia, J. Environmental Management, 2022",
+         "https://www.sciencedirect.com/science/article/abs/pii/S0301479722005801"),
+    24: ("Mahmoudi, Huda and Behnia, PV waste forecasting for Australia, 2019",
+         "https://opus.lib.uts.edu.au/handle/10453/140599"),
 }
 
 # --- Coordinate systems (CLAUDE.md modelling rules) ---------------------------
@@ -111,7 +115,7 @@ SCENARIOS = {
     "INTL_EARLY": {"beta": 30.0, "alpha": 2.4928, "source": "IRENA/IEA-PVPS 2016, early loss [13]"},
     "INTL_REGULAR": {"beta": 30.0, "alpha": 5.3759, "source": "IRENA/IEA-PVPS 2016, regular loss [13]"},
     "FITTED": {"beta": None, "alpha": 2.4928,  # beta from the fit stage (fit_report.json); alpha from [11]
-               "source": "Fitted from CER installs vs Census 2021 houses (§6.4); alpha from [11]"},
+               "source": "Fitted from CER installs vs Census 2021 houses; shape α from UNSW [11]"},
 }
 # Optimiser demand weights. §6.5 defaults to FITTED, but the fit lands at 0.3-0.5x reported national waste while
 # AU_RES matches it (step 5), so the team chose AU_RES on 2026-10-03. Every scenario gets its own site plan so

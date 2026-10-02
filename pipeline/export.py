@@ -6,7 +6,7 @@ import pandas as pd
 
 from pipeline.config import (CANDIDATE_TYPES, COVERAGE_RADIUS_KM, DATA_SOURCES, DEFAULT_SCENARIO, DEMAND_YEARS,
                              FIT_MAX_MEAN_KW, FIT_MIN_HOUSES, FORECAST_YEARS, INTERIM, MIN_SITES_PER_STATE, N_SITES,
-                             PANEL_TABLE, PANEL_TABLE_SOURCE, POA_GEOJSON_MAX_MB, PROCESSED, PROVISIONAL_MONTHS,
+                             PANEL_TABLE, PANEL_TABLE_SOURCE, POA_GEOJSON_MAX_MB, PROCESSED, PROVISIONAL_MONTHS, QA,
                              REFERENCES, WEB_DATA, WEB_DATA_MAX_MB)
 from pipeline.retirement import scenario_params
 
@@ -58,7 +58,21 @@ def assumptions_json() -> dict:
         ],
         "data_sources": DATA_SOURCES,
         "references": {str(n): {"title": t, "url": u} for n, (t, u) in REFERENCES.items()},
+        "qa": qa_json(),
     }
+
+
+def qa_json() -> dict:
+    """Data-quality figures quoted on the method page (limitations)."""
+    cer = pd.read_parquet(INTERIM / "cer_installs.parquet")
+    unmatched = pd.read_csv(QA / "unmatched_postcodes.csv", dtype={"postcode": str})
+    cand = pd.read_parquet(INTERIM / "candidates.parquet", columns=["spatial_confidence"])
+    return {"unmatched_postcodes": int(len(unmatched)), "unmatched_installs": int(unmatched["installs"].sum()),
+            "unmatched_kw_pct": round(100 * float(unmatched["kw"].sum() / cer["kw"].sum()), 3),
+            "candidate_sites": int(len(cand)),
+            "candidate_sites_town_centre": int((cand["spatial_confidence"].astype(str) == "1").sum()),
+            "first_install_month": cer["year_month"].min().strftime("%Y-%m"),
+            "last_install_month": cer["year_month"].max().strftime("%Y-%m")}
 
 
 def run() -> None:

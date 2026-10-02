@@ -22,7 +22,7 @@
       "name": "FITTED",
       "beta": 26.25,
       "alpha": 2.4928,
-      "source": "Fitted from CER installs vs Census 2021 houses (§6.4); alpha from [11]"
+      "source": "Fitted from CER installs vs Census 2021 houses; shape α from UNSW [11]"
     }
   ],
   "default_scenario": "AU_RES",
@@ -225,6 +225,23 @@
     "22": {
       "title": "Panel mass per MW estimate",
       "url": "https://freeingenergy.com/math/solar-panel-module-retired-waste-landfill-m134/"
+    },
+    "23": {
+      "title": "Optimised PV waste collection network for South Australia, J. Environmental Management, 2022",
+      "url": "https://www.sciencedirect.com/science/article/abs/pii/S0301479722005801"
+    },
+    "24": {
+      "title": "Mahmoudi, Huda and Behnia, PV waste forecasting for Australia, 2019",
+      "url": "https://opus.lib.uts.edu.au/handle/10453/140599"
     }
+  },
+  "qa": {
+    "unmatched_postcodes": 177,
+    "unmatched_installs": 2214,
+    "unmatched_kw_pct": 0.046,
+    "candidate_sites": 2488,
+    "candidate_sites_town_centre": 1535,
+    "first_install_month": "2001-04",
+    "last_install_month": "2026-08"
   }
 }

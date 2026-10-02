@@ -16,7 +16,7 @@ Work through the steps in order. Each step lists what to build, what it writes, 
 - [x] 7 Site optimiser and capitals-only baseline
 - [x] 8 Export web data
 - [x] 9 Map MVP
-- [ ] 10 Validation and method pages
+- [x] 10 Validation and method pages
 - [ ] 11 Materials layer (stretch)
 - [ ] 12 Polish and submission
 

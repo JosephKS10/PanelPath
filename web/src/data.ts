@@ -47,6 +47,45 @@ export interface Cohorts {
 export interface Assumptions {
   scenarios: { name: Scenario; beta: number; alpha: number; source: string }[];
   default_scenario: Scenario;
+  panel_table: { source: string; rows: { from_year: number; to_year: number | null; watts_per_panel: number;
+    kg_per_panel: number; kg_per_kw: number }[] };
+  settings: { name: string; value: number | string | (number | string)[]; source: string }[];
+  data_sources: { name: string; publisher: string; url: string; licence: string; attribution: string; used_for: string }[];
+  references: Record<string, { title: string; url: string }>;
+  qa: { unmatched_postcodes: number; unmatched_installs: number; unmatched_kw_pct: number; candidate_sites: number;
+    candidate_sites_town_centre: number; first_install_month: string; last_install_month: string };
+}
+
+export interface Target {
+  metric: "annual_tonnes" | "cumulative_tonnes" | "cumulative_panels";
+  year: number;
+  value: number;
+  label: string;
+  source: string;
+  lower_bound?: boolean;
+}
+export interface Validation {
+  targets: Target[];
+  scenarios: Record<Scenario, { targets: (Target & { model: number; ratio: number })[]; mean_abs_log_ratio: number }>;
+  closest: Scenario;
+  series: Record<Scenario, { years: number[]; tonnes: number[]; cumulative_tonnes: number[] }>;
+}
+
+interface FitRun { name: string; cutoff: string; n_poas: number; beta: number | null; rmse: number | null;
+  f15: number | null; denominator: string; max_mean_kw: number }
+export interface FitReport {
+  beta: number;
+  alpha: number;
+  n_poas: number;
+  rmse: number;
+  f15: number;
+  cutoff: string;
+  states: Record<string, number>;
+  filters: { min_dwellings: number; max_mean_kw: number; mean_kw_years: [number, number] };
+  grid: { beta: number[]; rmse: number[] };
+  sensitivity: FitRun[];
+  cross_check: { state: string; year: number; installs: number; share_FITTED: number; share_AU_RES: number }[];
+  poas: { poa_code: string[]; excess: number[]; modelled: number[] };
 }
 
 /** scenario -> year -> poa_code -> tonnes; a missing postcode means 0. */
@@ -61,6 +100,8 @@ export interface Data {
   coverage: Coverage;
   cohorts: Cohorts;
   assumptions: Assumptions;
+  validation: Validation;
+  fit: FitReport;
 }
 
 async function get<T>(name: string): Promise<T> {
@@ -70,12 +111,14 @@ async function get<T>(name: string): Promise<T> {
 }
 
 export async function loadData(): Promise<Data> {
-  const [poa, retirements, coverage, cohorts, assumptions, ...sites] = await Promise.all([
+  const [poa, retirements, coverage, cohorts, assumptions, validation, fit, ...sites] = await Promise.all([
     get<Data["poa"]>("poa.geojson"),
     get<Retirements>("retirements.json"),
     get<Coverage>("coverage.json"),
     get<Cohorts>("cohorts.json"),
     get<Assumptions>("assumptions.json"),
+    get<Validation>("validation.json"),
+    get<FitReport>("fit_report.json"),
     ...SCENARIOS.map((s) => get<Sites>(`sites_${s}.geojson`)),
   ] as const);
   return {
@@ -85,6 +128,8 @@ export async function loadData(): Promise<Data> {
     coverage: coverage as Coverage,
     cohorts: cohorts as Cohorts,
     assumptions: assumptions as Assumptions,
+    validation: validation as Validation,
+    fit: fit as FitReport,
     sites: Object.fromEntries(SCENARIOS.map((s, i) => [s, sites[i] as Sites])) as Record<Scenario, Sites>,
   };
 }
@@ -98,3 +143,15 @@ export const fmtT = (v: number) => fmt(v, v > 0 && v < 10 ? 1 : 0);
 /** Two significant figures below 10 (0.0042, 3.1), whole numbers above. */
 export const fmtSig = (v: number) =>
   v >= 10 || v === 0 ? fmt(v) : v.toLocaleString("en-AU", { maximumSignificantDigits: 2 });
+
+/** Line colours per scenario; the same as SCENARIO_COLORS in pipeline/config.py (validated categorical slots). */
+export const SCENARIO_COLOR: Record<Scenario, string> = {
+  AU_RES: "#2a78d6", INTL_EARLY: "#eb6834", INTL_REGULAR: "#1baf7a", FITTED: "#eda100",
+};
+
+export const SCENARIO_LABEL: Record<Scenario, string> = {
+  AU_RES: "Australian residential",
+  FITTED: "Fitted from our data",
+  INTL_EARLY: "International, early loss",
+  INTL_REGULAR: "International, regular loss",
+};

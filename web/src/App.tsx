@@ -1,14 +1,21 @@
 import { useEffect, useMemo, useState } from "react";
-import { fmt, fmtSig, fmtT, loadData, SCENARIOS, type Data, type Scenario } from "./data";
+import { fmt, fmtSig, fmtT, loadData, SCENARIO_LABEL, SCENARIOS, type Data, type Scenario } from "./data";
 import MapView, { quantileBreaks, RAMP, shadeValues, SITE_COLOR, type Metric } from "./MapView";
 import Panel, { type Selection } from "./Panel";
+import { MethodPage, ValidationPage } from "./Pages";
 
-const LABEL: Record<Scenario, string> = {
-  AU_RES: "Australian residential",
-  FITTED: "Fitted from our data",
-  INTL_EARLY: "International, early loss",
-  INTL_REGULAR: "International, regular loss",
-};
+const PAGES = [["map", "Map"], ["validation", "Validation"], ["method", "Method and sources"]] as const;
+type Page = (typeof PAGES)[number][0];
+const readPage = (): Page => (PAGES.find(([id]) => `#${id}` === window.location.hash)?.[0] ?? "map");
+
+function Nav({ page }: { page: Page }) {
+  return (
+    <nav className="nav" aria-label="Pages">
+      {PAGES.map(([id, label]) => <a key={id} href={`#${id}`} aria-current={page === id ? "page" : undefined}>{label}</a>)}
+    </nav>
+  );
+}
+
 
 export default function App() {
   const [data, setData] = useState<Data | null>(null);
@@ -18,6 +25,13 @@ export default function App() {
   const [playing, setPlaying] = useState(false);
   const [selection, setSelection] = useState<Selection | null>(null);
   const [metric, setMetric] = useState<Metric>("density");
+  const [page, setPage] = useState<Page>(readPage);
+
+  useEffect(() => {
+    const onHash = () => { setPage(readPage()); window.scrollTo(0, 0); };
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
 
   useEffect(() => {
     loadData()
@@ -50,6 +64,15 @@ export default function App() {
   if (error) return <div className="status error">Could not load PanelPath data: {error}</div>;
   if (!data) return <div className="status">Loading data…</div>;
 
+  if (page !== "map") {
+    return (
+      <div className="page-shell">
+        <header className="topbar"><a className="brand" href="#map">PanelPath</a><Nav page={page} /></header>
+        <main className="page">{page === "validation" ? <ValidationPage data={data} /> : <MethodPage data={data} />}</main>
+      </div>
+    );
+  }
+
   const national = Object.values(data.retirements[scenario][String(year)] ?? {}).reduce((a, b) => a + b, 0);
   const cov = data.coverage[scenario];
   const { radius_km, demand_years } = data.coverage.settings;
@@ -60,7 +83,8 @@ export default function App() {
       <aside className="sidebar">
         <header>
           <h1>PanelPath</h1>
-          <p>Where and when Australia's rooftop solar panels come off roofs, and where 100 collection sites would catch the most waste.</p>
+          <Nav page={page} />
+          <p>Where and when Australia's rooftop solar panels come off roofs, and where {data.coverage.settings.n_sites} collection sites would catch the most waste.</p>
         </header>
 
         <fieldset className="scenarios">
@@ -68,7 +92,7 @@ export default function App() {
           {SCENARIOS.map((s) => (
             <label key={s} className={s === scenario ? "on" : ""}>
               <input type="radio" name="scenario" value={s} checked={s === scenario} onChange={() => setScenario(s)} />
-              <span>{LABEL[s]}</span>
+              <span>{SCENARIO_LABEL[s]}</span>
               <small>{s === data.assumptions.default_scenario ? "default · " : ""}β {beta(s)} yr</small>
             </label>
           ))}
@@ -128,7 +152,8 @@ export default function App() {
         </section>
 
         <footer>
-          Data: Clean Energy Regulator, ABS and Geoscience Australia (CC BY 4.0). Straight-line distances. Panels installed after August 2026 are not included.
+          Data: Clean Energy Regulator, ABS and Geoscience Australia (CC BY 4.0). Straight-line distances. Panels installed after{" "}
+          {new Date(`${data.assumptions.qa.last_install_month}-01T00:00`).toLocaleDateString("en-AU", { month: "long", year: "numeric" })} are not included.
         </footer>
       </aside>
 
