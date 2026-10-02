@@ -97,6 +97,21 @@ FORECAST_YEARS = (2015, 2035)  # inclusive
 DEMAND_YEARS = (2026, 2030)  # inclusive; tonnes in this window weight the optimiser demand
 PROVISIONAL_MONTHS = 12  # recent CER months are incomplete (late registrations), §6.4 caveats
 
+# --- Validation targets, §9. Reported figures with varying year labels: a band, not exact targets. ---
+VALIDATION_TARGETS = [
+    {"metric": "annual_tonnes", "year": 2025, "value": 59_000, "label": "about 59 kt (reported for 2025)",
+     "source": "[7][8]"},
+    {"metric": "annual_tonnes", "year": 2030, "value": 91_000, "label": "more than 91 kt by 2030", "source": "[7][8]",
+     "lower_bound": True},
+    {"metric": "cumulative_tonnes", "year": 2035, "value": 1_000_000, "label": "around 1 Mt by 2035", "source": "[1]"},
+    {"metric": "cumulative_panels", "year": 2035, "value": 50_000_000, "label": "about 50M panels by 2035",
+     "source": "[1]"},
+]
+UNIT_ERROR_RATIO = 3.0  # §9: if every scenario is more than 3x off a target, suspect kW/MW or kg/t first
+
+# Chart colours per scenario: dataviz reference categorical slots 1-4 (light), validated for CVD separation.
+SCENARIO_COLORS = {"AU_RES": "#2a78d6", "INTL_EARLY": "#eb6834", "INTL_REGULAR": "#1baf7a", "FITTED": "#eda100"}
+
 # --- Lifetime fit, §6.4 and §7 --------------------------------------------------
 FIT_CUTOFF = date(2021, 8, 10)  # Census night 2021
 FIT_BETA_GRID = (10.0, 35.0, 0.25)  # start, stop (inclusive), step

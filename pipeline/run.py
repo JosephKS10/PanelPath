@@ -2,7 +2,7 @@
 import argparse
 import logging
 
-from pipeline import clean_cer, cohorts, geography, retirement
+from pipeline import clean_cer, cohorts, geography, retirement, validate
 
 log = logging.getLogger("pipeline")
 
@@ -20,6 +20,7 @@ STAGES["clean"] = clean_cer.run
 STAGES["geography"] = geography.run
 STAGES["cohorts"] = cohorts.run
 STAGES["retire"] = retirement.run
+STAGES["validate"] = validate.run
 
 
 def main() -> None:
