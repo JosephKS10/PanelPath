@@ -22,7 +22,7 @@ Before starting any build step, read these two files:
 
 ## Stack
 
-- **Pipeline:** Python 3.11 with pandas, numpy, pyarrow, geopandas, shapely, pyproj, scipy, matplotlib, pulp (optional exact solver) and pytest.
+- **Pipeline:** Python 3.11 with pandas, numpy, pyarrow, geopandas, shapely, pyproj, scipy, matplotlib, pulp (optional exact solver), openpyxl and pytest.
 - **Frontend:** Vite, React, TypeScript and MapLibre GL JS. It is a static site that reads precomputed files from `web/public/data/`. There is no backend in the MVP.
 
 ## Layout
