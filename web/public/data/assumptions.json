@@ -1,0 +1,230 @@
+{
+  "scenarios": [
+    {
+      "name": "AU_RES",
+      "beta": 17.0,
+      "alpha": 2.4928,
+      "source": "UNSW (Tan et al. 2022), Australian residential [11]"
+    },
+    {
+      "name": "INTL_EARLY",
+      "beta": 30.0,
+      "alpha": 2.4928,
+      "source": "IRENA/IEA-PVPS 2016, early loss [13]"
+    },
+    {
+      "name": "INTL_REGULAR",
+      "beta": 30.0,
+      "alpha": 5.3759,
+      "source": "IRENA/IEA-PVPS 2016, regular loss [13]"
+    },
+    {
+      "name": "FITTED",
+      "beta": 26.25,
+      "alpha": 2.4928,
+      "source": "Fitted from CER installs vs Census 2021 houses (§6.4); alpha from [11]"
+    }
+  ],
+  "default_scenario": "AU_RES",
+  "panel_table": {
+    "source": "Starting estimates anchored on 58-65 t/MW for 2018-era panels [22]; to verify",
+    "rows": [
+      {
+        "from_year": 2001,
+        "to_year": 2008,
+        "watts_per_panel": 170,
+        "kg_per_panel": 15.5,
+        "kg_per_kw": 91.2
+      },
+      {
+        "from_year": 2009,
+        "to_year": 2010,
+        "watts_per_panel": 185,
+        "kg_per_panel": 15.5,
+        "kg_per_kw": 83.8
+      },
+      {
+        "from_year": 2011,
+        "to_year": 2012,
+        "watts_per_panel": 200,
+        "kg_per_panel": 16.0,
+        "kg_per_kw": 80.0
+      },
+      {
+        "from_year": 2013,
+        "to_year": 2014,
+        "watts_per_panel": 240,
+        "kg_per_panel": 17.5,
+        "kg_per_kw": 72.9
+      },
+      {
+        "from_year": 2015,
+        "to_year": 2016,
+        "watts_per_panel": 265,
+        "kg_per_panel": 18.5,
+        "kg_per_kw": 69.8
+      },
+      {
+        "from_year": 2017,
+        "to_year": 2018,
+        "watts_per_panel": 300,
+        "kg_per_panel": 18.5,
+        "kg_per_kw": 61.7
+      },
+      {
+        "from_year": 2019,
+        "to_year": 2020,
+        "watts_per_panel": 330,
+        "kg_per_panel": 19.0,
+        "kg_per_kw": 57.6
+      },
+      {
+        "from_year": 2021,
+        "to_year": 2022,
+        "watts_per_panel": 390,
+        "kg_per_panel": 21.0,
+        "kg_per_kw": 53.8
+      },
+      {
+        "from_year": 2023,
+        "to_year": 2024,
+        "watts_per_panel": 430,
+        "kg_per_panel": 21.5,
+        "kg_per_kw": 50.0
+      },
+      {
+        "from_year": 2025,
+        "to_year": null,
+        "watts_per_panel": 450,
+        "kg_per_panel": 22.0,
+        "kg_per_kw": 48.9
+      }
+    ]
+  },
+  "settings": [
+    {
+      "name": "Forecast years",
+      "value": [
+        2015,
+        2035
+      ],
+      "source": "PanelPath setting"
+    },
+    {
+      "name": "Demand years for siting",
+      "value": [
+        2026,
+        2030
+      ],
+      "source": "PanelPath setting"
+    },
+    {
+      "name": "Collection sites",
+      "value": 100,
+      "source": "Pilot target of about 100 sites"
+    },
+    {
+      "name": "Coverage radius (km, straight line)",
+      "value": 30.0,
+      "source": "PanelPath setting"
+    },
+    {
+      "name": "Minimum sites per state",
+      "value": 2,
+      "source": "PanelPath setting"
+    },
+    {
+      "name": "Candidate facility types",
+      "value": [
+        "TRANSFER STATION",
+        "LANDFILL – PUTRESCIBLE",
+        "E-WASTE DROP-OFF FACILITY",
+        "E-WASTE RECYCLING FACILITY"
+      ],
+      "source": "Geoscience Australia facility types where public drop-off is plausible"
+    },
+    {
+      "name": "Lifetime fit: minimum houses per postcode",
+      "value": 500,
+      "source": "PanelPath setting"
+    },
+    {
+      "name": "Lifetime fit: maximum mean system size (kW)",
+      "value": 15.0,
+      "source": "PanelPath setting, excludes business-heavy postcodes"
+    },
+    {
+      "name": "Provisional months (late registrations)",
+      "value": 12,
+      "source": "PanelPath setting"
+    }
+  ],
+  "data_sources": [
+    {
+      "name": "Small-scale installation postcode data (SGU solar installations and capacity)",
+      "publisher": "Clean Energy Regulator",
+      "url": "https://cer.gov.au/markets/reports-and-data/small-scale-installation-postcode-data",
+      "licence": "CC BY 4.0",
+      "attribution": "Based on Clean Energy Regulator material licensed under a Creative Commons Attribution 4.0 licence",
+      "used_for": "Install cohorts: systems and kW by postcode and month since April 2001"
+    },
+    {
+      "name": "ASGS Edition 3 digital boundary files: POA, GCCSA and STE 2021 (GDA2020)",
+      "publisher": "Australian Bureau of Statistics",
+      "url": "https://www.abs.gov.au/statistics/standards/australian-statistical-geography-standard-asgs-edition-3/jul2021-jun2026/access-and-downloads/digital-boundary-files",
+      "licence": "CC BY 4.0",
+      "attribution": "Based on Australian Bureau of Statistics data",
+      "used_for": "Postcode polygons and centroids, states, capital-city areas"
+    },
+    {
+      "name": "Census 2021 General Community Profile DataPack, Postal Areas, table G36 Dwelling Structure",
+      "publisher": "Australian Bureau of Statistics",
+      "url": "https://www.abs.gov.au/census/find-census-data/datapacks",
+      "licence": "CC BY 4.0",
+      "attribution": "Based on Australian Bureau of Statistics data",
+      "used_for": "Occupied separate houses and semis per postcode (lifetime fit)"
+    },
+    {
+      "name": "Waste Management Facilities Database (eCat 147594)",
+      "publisher": "Geoscience Australia",
+      "url": "https://ecat.ga.gov.au/geonetwork/srv/api/records/495820b9-4a56-4409-9d1b-950589b50936",
+      "licence": "CC BY 4.0; incorporates G-NAF © Geoscape Australia under the G-NAF End User Licence Agreement",
+      "attribution": "© Commonwealth of Australia (Geoscience Australia) 2025",
+      "used_for": "Candidate collection sites"
+    }
+  ],
+  "references": {
+    "1": {
+      "title": "DCCEEW, National Solar Panel Recycling Pilot",
+      "url": "https://www.dcceew.gov.au/environment/protection/waste/solar-panels"
+    },
+    "7": {
+      "title": "Report on Senate committee evidence (panel age, 17% recycled, 59 kt to 91 kt)",
+      "url": "https://www.theepochtimes.com/world/call-for-nationwide-ban-on-sending-solar-panels-to-landfill-amid-vast-waste-concerns-6070508"
+    },
+    "8": {
+      "title": "NSW Government release on panel waste volumes",
+      "url": "https://www.nsw.gov.au/ministerial-releases/nsw-leads-way-towards-national-solar-panel-reuse-and-recycling-scheme"
+    },
+    "11": {
+      "title": "Tan, Dias, Chang and Deng (UNSW), Sustainability 14(9):5336, 2022",
+      "url": "https://www.mdpi.com/2071-1050/14/9/5336"
+    },
+    "12": {
+      "title": "RenewEconomy, pilot announcement and replacement share, Jan 2026",
+      "url": "https://reneweconomy.com.au/too-valuable-to-throw-out-labor-announces-first-national-solar-panel-recycling-pilot-program/"
+    },
+    "13": {
+      "title": "IRENA and IEA-PVPS, End-of-Life Management: Solar PV Panels, 2016",
+      "url": "https://www.irena.org/-/media/Files/IRENA/Agency/Publication/2016/IRENA_IEAPVPS_End-of-Life_Solar_PV_Panels_2016.pdf"
+    },
+    "20": {
+      "title": "EU Climate Dialogues, PV Circularity Policy Recommendations (Overview), 2024",
+      "url": "https://www.eeas.europa.eu/sites/default/files/documents/2024/23039%20-%20GIZ%20Solar%20PV%20Circularity%20Report%20Overview.pdf"
+    },
+    "22": {
+      "title": "Panel mass per MW estimate",
+      "url": "https://freeingenergy.com/math/solar-panel-module-retired-waste-landfill-m134/"
+    }
+  }
+}

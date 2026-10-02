@@ -1,0 +1,101 @@
+{
+  "AU_RES": {
+    "demand_tonnes": 313701.9644394793,
+    "optimised": {
+      "sites": 100,
+      "covered_tonnes": 277293.36393729347,
+      "covered_pct": 88.39388826676924,
+      "covered_poas": 1560,
+      "mean_distance_km": 30.7913605703946
+    },
+    "capitals_only": {
+      "sites": 100,
+      "covered_tonnes": 197130.25136954803,
+      "covered_pct": 62.83997989039665,
+      "covered_poas": 1136,
+      "mean_distance_km": 103.81058239721462
+    },
+    "exact": {
+      "objective": 278992.9263594071,
+      "status": "Optimal",
+      "solution": "Optimal Solution Found",
+      "seconds": 0.9,
+      "sites": 100,
+      "covered_tonnes": 278992.9263594069,
+      "covered_pct": 88.93566441571691,
+      "covered_poas": 1571,
+      "mean_distance_km": 30.704683890808216,
+      "greedy_vs_exact_pct": 99.39082239672128
+    },
+    "greedy_seconds": 0.01,
+    "sites_by_state": {
+      "ACT": 2,
+      "NSW": 33,
+      "NT": 2,
+      "QLD": 20,
+      "SA": 11,
+      "TAS": 3,
+      "VIC": 23,
+      "WA": 6
+    }
+  },
+  "FITTED": {
+    "demand_tonnes": 141100.97785507166,
+    "optimised": {
+      "sites": 100,
+      "covered_tonnes": 124327.54186833707,
+      "covered_pct": 88.11245943032158,
+      "covered_poas": 1560,
+      "mean_distance_km": 31.36930808695767
+    },
+    "capitals_only": {
+      "sites": 100,
+      "covered_tonnes": 88007.91167218864,
+      "covered_pct": 62.37229040509114,
+      "covered_poas": 1136,
+      "mean_distance_km": 105.02140161388468
+    },
+    "exact": {
+      "objective": 125120.24583522297,
+      "status": "Optimal",
+      "solution": "Optimal Solution Found",
+      "seconds": 0.8,
+      "sites": 100,
+      "covered_tonnes": 125120.24583522296,
+      "covered_pct": 88.6742584900702,
+      "covered_poas": 1571,
+      "mean_distance_km": 30.947045109140632,
+      "greedy_vs_exact_pct": 99.36644628405713
+    },
+    "greedy_seconds": 0.01,
+    "sites_by_state": {
+      "ACT": 2,
+      "NSW": 33,
+      "NT": 2,
+      "QLD": 20,
+      "SA": 11,
+      "TAS": 3,
+      "VIC": 23,
+      "WA": 6
+    }
+  },
+  "robustness": {
+    "shared_sites": 100,
+    "AU_RES_sites_under_FITTED_demand_pct": 88.11245943032158,
+    "FITTED_sites_under_FITTED_demand_pct": 88.11245943032158
+  },
+  "settings": {
+    "default_scenario": "AU_RES",
+    "n_sites": 100,
+    "radius_km": 30.0,
+    "min_sites_per_state": 2,
+    "demand_years": [
+      2026,
+      2030
+    ],
+    "candidates": 2488,
+    "capital_candidates": 532,
+    "distance": "straight line between POA centroid and site (EPSG:3577)",
+    "mean_distance": "tonne-weighted, every POA to its nearest chosen site"
+  }
+}

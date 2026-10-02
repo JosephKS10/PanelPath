@@ -45,6 +45,45 @@ DOWNLOADS = {
     "ga_waste_facilities_metadata.pdf": _GA + "147594_04_3.pdf",
 }
 
+# --- Data sources and licences, checked 2026-10-03 on each publisher's copyright page or product readme ----------
+DATA_SOURCES = [
+    {"name": "Small-scale installation postcode data (SGU solar installations and capacity)",
+     "publisher": "Clean Energy Regulator", "url": SOURCE_PAGES["cer_postcode"], "licence": "CC BY 4.0",
+     "attribution": "Based on Clean Energy Regulator material licensed under a Creative Commons Attribution 4.0 licence",
+     "used_for": "Install cohorts: systems and kW by postcode and month since April 2001"},
+    {"name": "ASGS Edition 3 digital boundary files: POA, GCCSA and STE 2021 (GDA2020)",
+     "publisher": "Australian Bureau of Statistics", "url": SOURCE_PAGES["abs_asgs"], "licence": "CC BY 4.0",
+     "attribution": "Based on Australian Bureau of Statistics data",
+     "used_for": "Postcode polygons and centroids, states, capital-city areas"},
+    {"name": "Census 2021 General Community Profile DataPack, Postal Areas, table G36 Dwelling Structure",
+     "publisher": "Australian Bureau of Statistics", "url": SOURCE_PAGES["abs_datapacks"], "licence": "CC BY 4.0",
+     "attribution": "Based on Australian Bureau of Statistics data",
+     "used_for": "Occupied separate houses and semis per postcode (lifetime fit)"},
+    {"name": "Waste Management Facilities Database (eCat 147594)", "publisher": "Geoscience Australia",
+     "url": SOURCE_PAGES["ga_waste_ecat"],
+     "licence": "CC BY 4.0; incorporates G-NAF © Geoscape Australia under the G-NAF End User Licence Agreement",
+     "attribution": "© Commonwealth of Australia (Geoscience Australia) 2025",
+     "used_for": "Candidate collection sites"},
+]
+# Works cited by number in charts, config and the method page (docs/CONTEXT.md §13).
+REFERENCES = {
+    1: ("DCCEEW, National Solar Panel Recycling Pilot",
+        "https://www.dcceew.gov.au/environment/protection/waste/solar-panels"),
+    7: ("Report on Senate committee evidence (panel age, 17% recycled, 59 kt to 91 kt)",
+        "https://www.theepochtimes.com/world/call-for-nationwide-ban-on-sending-solar-panels-to-landfill-amid-vast-waste-concerns-6070508"),
+    8: ("NSW Government release on panel waste volumes",
+        "https://www.nsw.gov.au/ministerial-releases/nsw-leads-way-towards-national-solar-panel-reuse-and-recycling-scheme"),
+    11: ("Tan, Dias, Chang and Deng (UNSW), Sustainability 14(9):5336, 2022",
+         "https://www.mdpi.com/2071-1050/14/9/5336"),
+    12: ("RenewEconomy, pilot announcement and replacement share, Jan 2026",
+         "https://reneweconomy.com.au/too-valuable-to-throw-out-labor-announces-first-national-solar-panel-recycling-pilot-program/"),
+    13: ("IRENA and IEA-PVPS, End-of-Life Management: Solar PV Panels, 2016",
+         "https://www.irena.org/-/media/Files/IRENA/Agency/Publication/2016/IRENA_IEAPVPS_End-of-Life_Solar_PV_Panels_2016.pdf"),
+    20: ("EU Climate Dialogues, PV Circularity Policy Recommendations (Overview), 2024",
+         "https://www.eeas.europa.eu/sites/default/files/documents/2024/23039%20-%20GIZ%20Solar%20PV%20Circularity%20Report%20Overview.pdf"),
+    22: ("Panel mass per MW estimate", "https://freeingenergy.com/math/solar-panel-module-retired-waste-landfill-m134/"),
+}
+
 # --- Coordinate systems (CLAUDE.md modelling rules) ---------------------------
 CRS_STORE = "EPSG:4326"  # storage
 CRS_METRIC = "EPSG:3577"  # GDA94 / Australian Albers, metres, for distances and areas
@@ -68,10 +107,11 @@ GEOJSON_DECIMALS = 4  # ~11 m at Australian latitudes, well below the simplifica
 
 # --- Retirement curve F(t) = 1 - exp(-(t/beta)^alpha), §6.3 -------------------
 SCENARIOS = {
-    "AU_RES": {"beta": 17.0, "alpha": 2.4928},  # UNSW, Tan et al. 2022, Australian residential [11]
-    "INTL_EARLY": {"beta": 30.0, "alpha": 2.4928},  # IRENA/IEA-PVPS 2016, early loss [13]
-    "INTL_REGULAR": {"beta": 30.0, "alpha": 5.3759},  # IRENA/IEA-PVPS 2016, regular loss [13]
-    "FITTED": {"beta": None, "alpha": 2.4928},  # beta fitted in step 6 (§6.4); alpha from [11]
+    "AU_RES": {"beta": 17.0, "alpha": 2.4928, "source": "UNSW (Tan et al. 2022), Australian residential [11]"},
+    "INTL_EARLY": {"beta": 30.0, "alpha": 2.4928, "source": "IRENA/IEA-PVPS 2016, early loss [13]"},
+    "INTL_REGULAR": {"beta": 30.0, "alpha": 5.3759, "source": "IRENA/IEA-PVPS 2016, regular loss [13]"},
+    "FITTED": {"beta": None, "alpha": 2.4928,  # beta from the fit stage (fit_report.json); alpha from [11]
+               "source": "Fitted from CER installs vs Census 2021 houses (§6.4); alpha from [11]"},
 }
 # Optimiser demand weights. §6.5 defaults to FITTED, but the fit lands at 0.3-0.5x reported national waste while
 # AU_RES matches it (step 5), so the team chose AU_RES on 2026-10-03. FITTED runs as a robustness check.
@@ -82,6 +122,7 @@ OPTIMISER_SCENARIOS = ("AU_RES", "FITTED")
 # (last install year inclusive, watts per panel, kg per panel). Starting estimates
 # anchored on 58-65 t/MW for 2018-era panels [22]. TODO: verify each row.
 # kg per kW = kg per panel * 1000 / watts -> 91, 84, 80, 73, 70, 62, 58, 54, 50, 49.
+PANEL_TABLE_SOURCE = "Starting estimates anchored on 58-65 t/MW for 2018-era panels [22]; to verify"
 PANEL_TABLE = [
     (2008, 170, 15.5),
     (2010, 185, 15.5),

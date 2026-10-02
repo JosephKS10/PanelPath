@@ -24,3 +24,18 @@ Where a postcode has more solar installs than houses, the excess is mostly repla
 - **Other confounders.** Some installs are second systems rather than replacements, and small business systems inflate counts. Postcodes averaging over 15 kW are excluded, and the 10 and 20 kW thresholds give the same β.
 - **Limited coverage.** The fit comes from full postcodes, mostly in QLD, SA and NSW, and is applied nationally. The error curve is flat above about 22 years, so the data rules out short lifetimes more firmly than it pins down one value.
 - **Recent months excluded.** The last 12 months of CER data are provisional and left out of the fit.
+
+## Web data
+
+`python -m pipeline.run --stage export` writes these files to `web/public/data/` (6.8 MB in total; the budget is 15 MB). Postcodes are 4-character strings with leading zeros, years are calendar years, and tonnes are metric tonnes.
+
+| File | Contents |
+|---|---|
+| `poa.geojson` | 2,641 postal areas (ABS POA 2021), simplified to 500 m for the web, EPSG:4326. Properties: `poa_code`, `state`. |
+| `retirements.json` | `{scenario: {year: {poa_code: tonnes}}}` for the scenarios `AU_RES`, `FITTED`, `INTL_EARLY` and `INTL_REGULAR`, for 2015 to 2035. Tonnes are rounded to 0.1, and a missing postcode means 0. |
+| `sites_<scenario>.geojson` | The 100 chosen collection sites (points, EPSG:4326). The top-level `years` array lists 2026 to 2035. Properties: `rank` (the order the site was picked), `id` (GA record ID), `name`, `owner`, `type` (GA facility types, separated by `; `), `state`, `suburb`, `in_capital`, `tonnes` and `panels` (arrays aligned with `years`), and `poas` (covered postal areas whose nearest site this is). |
+| `coverage.json` | One entry per scenario, holding `demand_tonnes` and three site sets: `optimised`, `capitals_only` and `exact`. Each set has `sites`, `covered_tonnes`, `covered_pct`, `covered_poas` and `mean_distance_km`. The `exact` entry also holds the solver status and `greedy_vs_exact_pct`. The file also has `robustness`, which compares site choices across scenarios, and `settings`. |
+| `validation.json` | `targets` (reported figures with sources), and `scenarios`, which holds each target's model value and ratio plus `mean_abs_log_ratio`. Also `closest`, and `series`, which gives `years`, `tonnes` and `cumulative_tonnes` per scenario. |
+| `fit_report.json` | The lifetime fit: `beta`, `alpha`, `n_poas`, `rmse`, `f15`, `cutoff`, `states`, `filters` and `grid` (β against RMSE). Also `sensitivity` (one row per run), `cross_check` (replacement share of installs by state and year) and `poas`, which gives the observed and modelled excess per fitted postal area. |
+| `cohorts.json` | `years` (install years, 2001 to 2026), `provisional_from` (the first provisional month), `installs` (`{poa_code: [installs per year]}`) and `houses` (`{poa_code: occupied separate houses, Census 2021}`). |
+| `assumptions.json` | `scenarios` (β, α, source), `default_scenario`, `panel_table` (watts, kg per panel and kg per kW by install year, with source), `settings`, `data_sources` (publisher, URL, licence, attribution) and `references` (the numbered works cited). |

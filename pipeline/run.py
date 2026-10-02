@@ -2,18 +2,9 @@
 import argparse
 import logging
 
-from pipeline import clean_cer, cohorts, geography, optimiser, replacement_fit, retirement, validate
+from pipeline import clean_cer, cohorts, export, geography, optimiser, replacement_fit, retirement, validate
 
-log = logging.getLogger("pipeline")
-
-
-def _stub(name: str):
-    def run() -> None:
-        log.info("stage %s: not implemented", name)
-    return run
-
-
-# Order matters for --stage all: fit runs before retire so FITTED gets its beta. Stubs are replaced as steps land.
+# Order matters for --stage all: fit runs before retire so FITTED gets its beta.
 STAGES = {
     "clean": clean_cer.run,
     "geography": geography.run,
@@ -22,7 +13,7 @@ STAGES = {
     "retire": retirement.run,
     "optimise": optimiser.run,
     "validate": validate.run,
-    "export": _stub("export"),
+    "export": export.run,
 }
 
 
