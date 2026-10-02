@@ -2,6 +2,8 @@
 import argparse
 import logging
 
+from pipeline import clean_cer
+
 log = logging.getLogger("pipeline")
 
 
@@ -14,6 +16,7 @@ def _stub(name: str):
 # Order matters for --stage all. Replace each stub with the real module's run() as steps land.
 STAGES = {name: _stub(name) for name in
           ["clean", "geography", "cohorts", "retire", "fit", "optimise", "validate", "export"]}
+STAGES["clean"] = clean_cer.run
 
 
 def main() -> None:
