@@ -64,5 +64,12 @@
     "download_date": "2026-10-03",
     "sha256": "744b0ad8f971374d89542a99cc7a3a3fe4b51bced22147f0ad396048152ee43d",
     "bytes": 4927003
+  },
+  "researchgate_pv_composition_table.png": {
+    "url": "https://www.researchgate.net/figure/The-composition-of-a-crystalline-silicon-solar-panel_tbl2_376710187",
+    "download_date": "2026-10-03",
+    "sha256": "28534d7935fa17414c844ed854974f2978ffbfda10df1a54ef5fafcfbfe899d2",
+    "bytes": 67321,
+    "note": "Screenshot saved by the team in a browser; ResearchGate blocks automated access (HTTP 403, CAPTCHA). Values transcribed into pipeline/config.py MATERIAL_SHARES."
   }
 }

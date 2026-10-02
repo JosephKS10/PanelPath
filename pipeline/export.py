@@ -6,8 +6,7 @@ import pandas as pd
 
 from pipeline.config import (CANDIDATE_TYPES, COVERAGE_RADIUS_KM, DATA_SOURCES, DEFAULT_SCENARIO, DEMAND_YEARS,
                              FIT_MAX_MEAN_KW, FIT_MIN_HOUSES, FORECAST_YEARS, INTERIM, MATERIAL_SHARES,
-                             MATERIALS_SOURCE, MIN_SITES_PER_STATE, N_SITES, SILVER_G_PER_PANEL, SILVER_MASS_SHARE_TEXT,
-                             SILVER_VALUE_SHARE, SITE_YEARS,
+                             MATERIALS_SOURCE, MIN_SITES_PER_STATE, N_SITES, SILVER_VALUE_SHARE, SITE_YEARS,
                              PANEL_TABLE, PANEL_TABLE_SOURCE, POA_GEOJSON_MAX_MB, PROCESSED, PROVISIONAL_MONTHS, QA,
                              REFERENCES, WEB_DATA, WEB_DATA_MAX_MB)
 from pipeline.materials import KEYS, split
@@ -66,21 +65,19 @@ def assumptions_json() -> dict:
 
 
 def materials_json(ret: pd.DataFrame) -> dict:
-    """Materials in panels retiring over SITE_YEARS, per scenario: national, per postcode and per chosen site."""
+    """Material tonnes in panels retiring over SITE_YEARS, per scenario: national, per postcode and per chosen site."""
     window = ret[ret["year"].between(*SITE_YEARS)]
-    rnd = lambda xs: [round(x, 1) for x in xs]
+    rnd = lambda xs: [round(x, 3) for x in xs]  # 0.001 t = 1 kg, so silver stays readable
     out = {"years": list(SITE_YEARS), "source": MATERIALS_SOURCE, "shares": MATERIAL_SHARES,
-           "silver_g_per_panel": list(SILVER_G_PER_PANEL), "silver_mass_share": SILVER_MASS_SHARE_TEXT,
            "silver_value_share": SILVER_VALUE_SHARE, "keys": KEYS, "national": {}, "poa": {}, "sites": {}}
     for scen, g in window.groupby("scenario"):
-        by_poa = g.groupby("poa_code")[["tonnes", "panels"]].sum()
-        out["national"][scen] = rnd(split(by_poa["tonnes"].sum(), by_poa["panels"].sum()))
-        out["poa"][scen] = {p: rnd(split(t, n)) for p, t, n in zip(by_poa.index, by_poa["tonnes"], by_poa["panels"])}
+        by_poa = g.groupby("poa_code")["tonnes"].sum()
+        out["national"][scen] = rnd(split(by_poa.sum()))
+        out["poa"][scen] = {p: rnd(split(t)) for p, t in by_poa.items()}
         sites_file = PROCESSED / f"sites_{scen}.geojson"
         if sites_file.exists():
             feats = json.loads(sites_file.read_text())["features"]
-            out["sites"][scen] = {f["properties"]["id"]: rnd(split(sum(f["properties"]["tonnes"]),
-                                                                  sum(f["properties"]["panels"]))) for f in feats}
+            out["sites"][scen] = {f["properties"]["id"]: rnd(split(sum(f["properties"]["tonnes"]))) for f in feats}
     return out
 
 

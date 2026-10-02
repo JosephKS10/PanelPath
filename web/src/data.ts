@@ -88,13 +88,11 @@ export interface FitReport {
   poas: { poa_code: string[]; excess: number[]; modelled: number[] };
 }
 
-/** Materials in panels retiring over `years`; arrays follow `keys` (tonnes per material, then silver kg low/high). */
+/** Material tonnes in panels retiring over `years`; arrays follow `keys`. */
 export interface Materials {
   years: [number, number];
   source: string;
   shares: Record<string, number>;
-  silver_g_per_panel: [number, number];
-  silver_mass_share: string;
   silver_value_share: number;
   keys: string[];
   national: Record<Scenario, number[]>;
@@ -172,3 +170,11 @@ export const SCENARIO_LABEL: Record<Scenario, string> = {
   INTL_EARLY: "International, early loss",
   INTL_REGULAR: "International, regular loss",
 };
+
+export const MATERIAL_LABEL: Record<string, string> = {
+  glass: "Glass", aluminium: "Aluminium", polymer: "Polymer", silicon: "Silicon", copper: "Copper",
+  tin_lead: "Tin and lead", silver: "Silver",
+};
+
+/** Material tonnes for display: kilograms below 10 t (silver, tin and lead), tonnes above. */
+export const fmtMass = (t: number) => (t < 10 ? `${fmt(t * 1000)} kg` : `${fmt(t)} t`);

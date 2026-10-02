@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { fmt, fmtT, type Data, type Scenario } from "./data";
+import { fmt, fmtMass, fmtT, MATERIAL_LABEL, type Data, type Scenario } from "./data";
 import { RAMP, SITE_COLOR } from "./MapView";
 
 export type Selection = { kind: "poa"; code: string } | { kind: "site"; id: string };
@@ -85,34 +85,27 @@ function SiteDetails({ data, scenario, year, id }: { data: Data; scenario: Scena
   );
 }
 
-const MATERIAL_LABEL: Record<string, string> = {
-  glass: "Glass", polymer: "Polymer", aluminium: "Aluminium", silicon: "Silicon", copper: "Copper",
-};
-
 /** Recoverable materials in panels retiring over the materials window, and silver's mass vs value share. */
 function UrbanMine({ data, values }: { data: Data; values?: number[] }) {
   const m = data.materials;
   if (!values) return null;
-  const [y0, y1] = m.years;
-  const silver = [values[m.keys.indexOf("silver_kg_low")], values[m.keys.indexOf("silver_kg_high")]];
-  const metals = Object.keys(m.shares);
   return (
     <section className="mine">
-      <p className="mine-title">Rooftop urban mine, {y0}–{y1}</p>
+      <p className="mine-title">Rooftop urban mine, {m.years.join("–")}</p>
       <table>
         <tbody>
-          {metals.map((k) => (
-            <tr key={k}><td>{MATERIAL_LABEL[k] ?? k}</td><td>{fmtT(values[m.keys.indexOf(k)])} t</td></tr>
+          {m.keys.map((k, i) => (
+            <tr key={k} className={k === "silver" ? "silver" : ""}><td>{MATERIAL_LABEL[k] ?? k}</td><td>{fmtMass(values[i])}</td></tr>
           ))}
-          <tr className="silver"><td>Silver</td><td>{fmt(silver[0])}–{fmt(silver[1])} kg</td></tr>
         </tbody>
       </table>
       <div className="silver-compare" aria-label="Silver share of panel mass against share of material value">
-        <div><span className="bar"><i style={{ width: "0.1%" }} /></span>Silver is {m.silver_mass_share} of panel mass</div>
+        <div><span className="bar"><i style={{ width: `${100 * m.shares.silver}%` }} /></span>
+          Silver is {fmt(100 * m.shares.silver, 2)}% of panel mass</div>
         <div><span className="bar"><i style={{ width: `${100 * m.silver_value_share}%` }} /></span>
           but {fmt(100 * m.silver_value_share)}% of its material value</div>
       </div>
-      <p className="note">Composition and silver from IRENA and IEA-PVPS (2016), assuming crystalline-silicon panels.</p>
+      <p className="note">Composition from a published table of crystalline-silicon panels; silver's value share from IRENA and IEA-PVPS (2016).</p>
     </section>
   );
 }

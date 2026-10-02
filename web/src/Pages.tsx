@@ -1,5 +1,5 @@
 import { LineChart, ScatterChart } from "./charts";
-import { fmt, SCENARIO_COLOR, SCENARIO_LABEL, SCENARIOS, type Data, type Scenario, type Target } from "./data";
+import { fmt, fmtMass, MATERIAL_LABEL, SCENARIO_COLOR, SCENARIO_LABEL, SCENARIOS, type Data, type Scenario, type Target } from "./data";
 
 // Every model number on these pages is read from web/public/data/ (validation.json, fit_report.json,
 // coverage.json, assumptions.json, cohorts.json). Reported figures carry their reference number.
@@ -228,19 +228,19 @@ export function MethodPage({ data }: { data: Data }) {
           <thead><tr><th>Material</th><th>Share of panel mass</th></tr></thead>
           <tbody>
             {Object.entries(data.materials.shares).map(([k, v]) => (
-              <tr key={k}><td>{k[0].toUpperCase() + k.slice(1)}</td><td>{pct(v)}</td></tr>
+              <tr key={k}><td>{MATERIAL_LABEL[k] ?? k}</td><td>{(100 * v).toLocaleString("en-AU", { maximumFractionDigits: 2 })}%</td></tr>
             ))}
-            <tr><td>Silver</td><td>{data.materials.silver_mass_share} ({data.materials.silver_g_per_panel.join("–")} g per panel)</td></tr>
           </tbody>
         </table>
       </div>
       <p className="note">
-        Silver is {pct(data.materials.silver_value_share)} of a panel's material value. Under {a.default_scenario}, panels
-        retiring {data.materials.years.join("–")} hold about {(() => {
+        Silver is {pct(data.materials.silver_value_share)} of a panel's material value <Ref n="13" data={data} />.
+        Under {a.default_scenario}, panels retiring {data.materials.years.join("–")} hold about {(() => {
           const n = data.materials.national[a.default_scenario], k = data.materials.keys;
-          const t = (key: string) => `${fmt(n[k.indexOf(key)] / 1000)} kt of ${key}`;
-          return `${t("glass")}, ${t("aluminium")}, ${t("silicon")} and ${t("copper")}, plus ${fmt(n[k.indexOf("silver_kg_low")] / 1000)}–${fmt(n[k.indexOf("silver_kg_high")] / 1000)} t of silver`;
-        })()}. {data.materials.source.replace(/\s*\[\d+\]/g, "")} <Refs source={data.materials.source} data={data} />
+          const t = (key: string) => `${fmtMass(n[k.indexOf(key)])} of ${(MATERIAL_LABEL[key] ?? key).toLowerCase()}`;
+          return `${t("glass")}, ${t("aluminium")}, ${t("silicon")} and ${t("copper")}, plus ${t("silver")} and ${t("tin_lead")}`;
+        })()}. Composition is column [40] of the table in <Ref n="21" data={data} />; aluminium combines frame and cell,
+        polymer combines encapsulant, backing film and junction-box plastic, and every panel is assumed to be crystalline silicon.
       </p>
       <h3>Settings</h3>
       <div className="table-wrap">

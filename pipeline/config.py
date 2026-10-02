@@ -43,7 +43,7 @@ DOWNLOADS = {
     # "Waste_Management_Facilities_2025", newer than the 2022 update cited in CONTEXT [17]. GeoJSON + field defs PDF.
     "ga_waste_facilities.geojson": _GA + "147594_00_1.json",
     "ga_waste_facilities_metadata.pdf": _GA + "147594_04_3.pdf",
-    # IRENA and IEA-PVPS 2016 [13]: c-Si panel composition and silver content/value for the materials layer.
+    # IRENA and IEA-PVPS 2016 [13]: silver's share of panel material value (Figure 24) for the materials layer.
     "irena_ieapvps_end_of_life_pv_2016.pdf":
         "https://www.irena.org/-/media/Files/IRENA/Agency/Publication/2016/IRENA_IEAPVPS_End-of-Life_Solar_PV_Panels_2016.pdf",
 }
@@ -84,6 +84,8 @@ REFERENCES = {
          "https://www.irena.org/-/media/Files/IRENA/Agency/Publication/2016/IRENA_IEAPVPS_End-of-Life_Solar_PV_Panels_2016.pdf"),
     20: ("EU Climate Dialogues, PV Circularity Policy Recommendations (Overview), 2024",
          "https://www.eeas.europa.eu/sites/default/files/documents/2024/23039%20-%20GIZ%20Solar%20PV%20Circularity%20Report%20Overview.pdf"),
+    21: ("Composition of a crystalline silicon panel (table citing IEA-PVPS 2016)",
+         "https://www.researchgate.net/figure/The-composition-of-a-crystalline-silicon-solar-panel_tbl2_376710187"),
     22: ("Panel mass per MW estimate", "https://freeingenergy.com/math/solar-panel-module-retired-waste-landfill-m134/"),
     23: ("Optimised PV waste collection network for South Australia, J. Environmental Management, 2022",
          "https://www.sciencedirect.com/science/article/abs/pii/S0301479722005801"),
@@ -194,15 +196,17 @@ CANDIDATE_TYPES = ("TRANSFER STATION", "LANDFILL – PUTRESCIBLE", "E-WASTE DROP
                    "E-WASTE RECYCLING FACILITY")
 
 # --- Materials layer (stretch), §6.6 --------------------------------------------------
-# c-Si panel composition by mass, IRENA/IEA-PVPS 2016 [13] p.41: "about 76% glass, 10% polymer, 8% aluminium,
-# 5% silicon, 1% copper and less than 0.1% silver and other metals". CONTEXT points to [21], a ResearchGate table
-# citing this report; [21] returned HTTP 403 (CAPTCHA) on 2026-10-03, so the primary source is used directly.
+# c-Si panel composition by mass from [21], the table "The composition of a crystalline silicon solar panel".
+# We use its column [40]: the only column that matches CONTEXT's silver ~0.05% and sums to 100% (99.99%);
+# column [4] sums to 100.93%, and [41] and [12] have gaps. Transcribed from a browser screenshot the team saved
+# on 2026-10-03 (data/raw/researchgate_pv_composition_table.png; ResearchGate blocks automated access).
+# Groups: aluminium = frame 18% + cell 0.53%; polymer = EVA 5.1% + backing film 1.5% + junction-box plastic 0.67%;
+# copper = cell 0.11% + junction box 0.33%; tin and lead are one merged cell (0.05%) in the table.
 # Assumes every panel is crystalline silicon (thin film is a negligible share of Australian rooftops; TODO: verify).
-MATERIAL_SHARES = {"glass": 0.76, "polymer": 0.10, "aluminium": 0.08, "silicon": 0.05, "copper": 0.01}
-SILVER_G_PER_PANEL = (6.0, 10.0)  # "a typical c-Si panel contains about 6-10 grammes of silver", [13] Box 22 p.78
-SILVER_MASS_SHARE_TEXT = "less than 0.1%"  # [13] p.41, quoted rather than a point value
-SILVER_VALUE_SHARE = 0.47  # silver's share of a c-Si panel's material value, [13] Figure 24 p.78
-MATERIALS_SOURCE = "IRENA and IEA-PVPS 2016, End-of-Life Management: Solar PV Panels, pp. 41 and 78 [13]"
+MATERIAL_SHARES = {"glass": 0.70, "aluminium": 0.1853, "polymer": 0.0727, "silicon": 0.0365, "copper": 0.0044,
+                   "tin_lead": 0.0005, "silver": 0.0005}
+SILVER_VALUE_SHARE = 0.47  # silver's share of a c-Si panel's material value, IRENA/IEA-PVPS 2016 [13] Figure 24 p.78
+MATERIALS_SOURCE = "Composition: table in [21] (its column [40]). Silver's value share: IRENA and IEA-PVPS 2016 [13]"
 
 # --- Web data budget (CLAUDE.md code style) -------------------------------------
 WEB_DATA_MAX_MB = 15.0
