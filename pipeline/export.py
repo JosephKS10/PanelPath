@@ -12,7 +12,7 @@ from pipeline.retirement import scenario_params
 
 
 def _write(name: str, obj) -> None:
-    (WEB_DATA / name).write_text(json.dumps(obj, separators=(",", ":")))
+    (WEB_DATA / name).write_text(json.dumps(obj, separators=(",", ":"), allow_nan=False))
 
 
 def retirements_json(ret: pd.DataFrame) -> dict:
@@ -71,7 +71,7 @@ def run() -> None:
     poa = pd.read_parquet(INTERIM / "poa.parquet")
     _write("retirements.json", retirements_json(pd.read_parquet(PROCESSED / "retirements.parquet")))
     _write("cohorts.json", cohorts_json(pd.read_parquet(INTERIM / "cohorts.parquet"), poa))
-    (WEB_DATA / "assumptions.json").write_text(json.dumps(assumptions_json(), indent=2, ensure_ascii=False) + "\n")
+    (WEB_DATA / "assumptions.json").write_text(json.dumps(assumptions_json(), indent=2, ensure_ascii=False, allow_nan=False) + "\n")
 
     sizes = {p.name: p.stat().st_size / 1e6 for p in sorted(WEB_DATA.iterdir()) if p.is_file()}
     for name, mb in sizes.items():

@@ -33,8 +33,11 @@ def candidates() -> gpd.GeoDataFrame:
     g = g.sort_values(["cluster", "rank"])  # each merged site keeps its highest-ranked record, listing all types
     types = g.groupby("cluster")["FACILITY_INFRASTRUCTURE_TYPE"].agg(lambda s: "; ".join(dict.fromkeys(s)))
     first = g.drop_duplicates("cluster").set_index("cluster")
+    # 80 GA records have no UNIQUE_RECORD_ID; OBJECTID is always present and unique in this release.
+    ids = first["UNIQUE_RECORD_ID"].fillna("GA-OBJECTID-" + first["OBJECTID"].astype(str))
+    names = first["FACILITY_NAME"].fillna("Unnamed " + first["FACILITY_INFRASTRUCTURE_TYPE"].str.lower())
     sites = gpd.GeoDataFrame({
-        "id": first["UNIQUE_RECORD_ID"], "name": first["FACILITY_NAME"].str.title(),
+        "id": ids, "name": names.str.title(),
         "owner": first["FACILITY_OWNER"].str.title(), "type": types, "state": first["STATE"],
         "suburb": first["SUBURB"].str.title(), "spatial_confidence": first["SPATIAL_CONFIDENCE"],
     }, geometry=first.geometry, crs=CRS_METRIC).reset_index(drop=True)

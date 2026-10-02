@@ -83,6 +83,11 @@ def evaluate(site_xy: np.ndarray, demand_xy: np.ndarray, weights: np.ndarray, ra
             "mean_distance_km": float((dist * weights).sum() / weights.sum() / 1000)}
 
 
+def _str(v) -> str | None:
+    """Missing text as None (JSON null) rather than NaN."""
+    return None if pd.isna(v) else str(v)
+
+
 def site_features(sites: gpd.GeoDataFrame, chosen: list[int], demand_xy: np.ndarray, poa_codes: np.ndarray,
                   tonnes: np.ndarray, panels: np.ndarray, radius: float) -> list[dict]:
     """GeoJSON features for chosen sites; each covered POA is assigned to its nearest chosen site."""
@@ -96,8 +101,8 @@ def site_features(sites: gpd.GeoDataFrame, chosen: list[int], demand_xy: np.ndar
         mine = nearest == k
         feats.append({"type": "Feature",
                       "geometry": {"type": "Point", "coordinates": [round(pt.x, 5), round(pt.y, 5)]},
-                      "properties": {"rank": k + 1, "id": row.id, "name": row.name, "owner": row.owner,
-                                     "type": row.type, "state": row.state, "suburb": row.suburb,
+                      "properties": {"rank": k + 1, "id": row.id, "name": row.name, "owner": _str(row.owner),
+                                     "type": row.type, "state": row.state, "suburb": _str(row.suburb),
                                      "in_capital": bool(row.in_capital),
                                      "tonnes": tonnes[mine].sum(axis=0).round(1).tolist(),
                                      "panels": panels[mine].sum(axis=0).round(0).astype(int).tolist(),
@@ -151,7 +156,7 @@ def run() -> None:
         feats = site_features(sites, chosen, demand_xy, poa["poa_code"].to_numpy(),
                               wide["tonnes"][site_years].to_numpy(), wide["panels"][site_years].to_numpy(), radius)
         (PROCESSED / f"sites_{scen}.geojson").write_text(json.dumps(
-            {"type": "FeatureCollection", "years": site_years, "features": feats}) + "\n")
+            {"type": "FeatureCollection", "years": site_years, "features": feats}, allow_nan=False) + "\n")
         print(f"\n{scen}: demand {w.sum():,.0f} t retiring {DEMAND_YEARS[0]}-{DEMAND_YEARS[1]}")
         print(f"  optimised     {opt['covered_pct']:5.1f}% covered, mean distance {opt['mean_distance_km']:6.1f} km "
               f"(greedy {greedy_s:.2f} s)")
@@ -176,5 +181,5 @@ def run() -> None:
                        "candidates": int(len(sites)), "capital_candidates": int(len(cap_idx)),
                        "distance": "straight line between POA centroid and site (EPSG:3577)",
                        "mean_distance": "tonne-weighted, every POA to its nearest chosen site"}
-    (PROCESSED / "coverage.json").write_text(json.dumps(out, indent=2) + "\n")
+    (PROCESSED / "coverage.json").write_text(json.dumps(out, indent=2, allow_nan=False) + "\n")
     print(f"wrote {PROCESSED / 'coverage.json'} and sites_<scenario>.geojson")

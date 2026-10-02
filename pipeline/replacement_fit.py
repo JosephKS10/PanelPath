@@ -155,7 +155,7 @@ def run() -> None:
               "cross_check_reference": "over a third of new installs in some states are replacements [12]",
               "poas": main["poas"]}
     PROCESSED.mkdir(parents=True, exist_ok=True)
-    (PROCESSED / "fit_report.json").write_text(json.dumps(report, indent=2) + "\n")
+    (PROCESSED / "fit_report.json").write_text(json.dumps(report, indent=2, allow_nan=False) + "\n")
     FIGURES.mkdir(parents=True, exist_ok=True)
     plot(main, FIGURES / "fit_excess_vs_model.png")
 

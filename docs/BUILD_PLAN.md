@@ -15,7 +15,7 @@ Work through the steps in order. Each step lists what to build, what it writes, 
 - [x] 6 Lifetime fit (the creative twist)
 - [x] 7 Site optimiser and capitals-only baseline
 - [x] 8 Export web data
-- [ ] 9 Map MVP
+- [x] 9 Map MVP
 - [ ] 10 Validation and method pages
 - [ ] 11 Materials layer (stretch)
 - [ ] 12 Polish and submission

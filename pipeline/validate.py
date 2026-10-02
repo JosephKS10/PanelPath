@@ -92,7 +92,7 @@ def run() -> None:
               for name, g in national.sort_values("year").groupby("scenario")}
     out = {"targets": VALIDATION_TARGETS, "scenarios": result, "closest": closest, "series": series,
            "note": f"Cumulative figures count retirements from {national['year'].min()}."}
-    (PROCESSED / "validation.json").write_text(json.dumps(out, indent=2) + "\n")
+    (PROCESSED / "validation.json").write_text(json.dumps(out, indent=2, allow_nan=False) + "\n")
     FIGURES.mkdir(parents=True, exist_ok=True)
     plot(national, FIGURES / "validation_national.png")
     print(f"wrote {PROCESSED / 'validation.json'} and {FIGURES / 'validation_national.png'}")

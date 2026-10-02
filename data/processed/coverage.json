@@ -19,7 +19,7 @@
       "objective": 278992.9263594071,
       "status": "Optimal",
       "solution": "Optimal Solution Found",
-      "seconds": 0.9,
+      "seconds": 1.0,
       "sites": 100,
       "covered_tonnes": 278992.9263594069,
       "covered_pct": 88.93566441571691,
@@ -76,6 +76,86 @@
       "SA": 11,
       "TAS": 3,
       "VIC": 23,
+      "WA": 6
+    }
+  },
+  "INTL_EARLY": {
+    "demand_tonnes": 105956.03351663594,
+    "optimised": {
+      "sites": 100,
+      "covered_tonnes": 93315.33005236684,
+      "covered_pct": 88.06985969111008,
+      "covered_poas": 1560,
+      "mean_distance_km": 31.466897747043145
+    },
+    "capitals_only": {
+      "sites": 100,
+      "covered_tonnes": 66013.65018628194,
+      "covered_pct": 62.30287034661152,
+      "covered_poas": 1136,
+      "mean_distance_km": 105.19565901296875
+    },
+    "exact": {
+      "objective": 93915.40351933245,
+      "status": "Optimal",
+      "solution": "Optimal Solution Found",
+      "seconds": 1.1,
+      "sites": 100,
+      "covered_tonnes": 93915.40351933276,
+      "covered_pct": 88.63620164168121,
+      "covered_poas": 1570,
+      "mean_distance_km": 31.45969145445586,
+      "greedy_vs_exact_pct": 99.36104893928037
+    },
+    "greedy_seconds": 0.01,
+    "sites_by_state": {
+      "ACT": 2,
+      "NSW": 33,
+      "NT": 2,
+      "QLD": 20,
+      "SA": 11,
+      "TAS": 3,
+      "VIC": 23,
+      "WA": 6
+    }
+  },
+  "INTL_REGULAR": {
+    "demand_tonnes": 24456.783218312423,
+    "optimised": {
+      "sites": 100,
+      "covered_tonnes": 21309.675304081105,
+      "covered_pct": 87.13196299718244,
+      "covered_poas": 1556,
+      "mean_distance_km": 33.80663252679477
+    },
+    "capitals_only": {
+      "sites": 100,
+      "covered_tonnes": 14845.18155883698,
+      "covered_pct": 60.699648953511605,
+      "covered_poas": 1136,
+      "mean_distance_km": 109.07233222803669
+    },
+    "exact": {
+      "objective": 21476.699254780153,
+      "status": "Optimal",
+      "solution": "Optimal Solution Found",
+      "seconds": 0.8,
+      "sites": 100,
+      "covered_tonnes": 21476.699254780135,
+      "covered_pct": 87.81489807171,
+      "covered_poas": 1575,
+      "mean_distance_km": 33.80888301964773,
+      "greedy_vs_exact_pct": 99.22230158034245
+    },
+    "greedy_seconds": 0.01,
+    "sites_by_state": {
+      "ACT": 2,
+      "NSW": 32,
+      "NT": 2,
+      "QLD": 20,
+      "SA": 13,
+      "TAS": 3,
+      "VIC": 22,
       "WA": 6
     }
   },

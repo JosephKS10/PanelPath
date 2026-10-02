@@ -114,9 +114,10 @@ SCENARIOS = {
                "source": "Fitted from CER installs vs Census 2021 houses (§6.4); alpha from [11]"},
 }
 # Optimiser demand weights. §6.5 defaults to FITTED, but the fit lands at 0.3-0.5x reported national waste while
-# AU_RES matches it (step 5), so the team chose AU_RES on 2026-10-03. FITTED runs as a robustness check.
+# AU_RES matches it (step 5), so the team chose AU_RES on 2026-10-03. Every scenario gets its own site plan so
+# the map's scenario toggle always has sites and coverage; FITTED vs AU_RES is the robustness check.
 DEFAULT_SCENARIO = "AU_RES"
-OPTIMISER_SCENARIOS = ("AU_RES", "FITTED")
+OPTIMISER_SCENARIOS = ("AU_RES", "FITTED", "INTL_EARLY", "INTL_REGULAR")
 
 # --- Panel watts and mass by install year, §7 ---------------------------------
 # (last install year inclusive, watts per panel, kg per panel). Starting estimates
