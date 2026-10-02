@@ -26,6 +26,9 @@ export default function App() {
   const [selection, setSelection] = useState<Selection | null>(null);
   const [metric, setMetric] = useState<Metric>("density");
   const [page, setPage] = useState<Page>(readPage);
+  const [focus, setFocus] = useState<{ code: string; seq: number } | null>(null);
+  const [query, setQuery] = useState("");
+  const [searchMsg, setSearchMsg] = useState("");
 
   useEffect(() => {
     const onHash = () => { setPage(readPage()); window.scrollTo(0, 0); };
@@ -84,6 +87,21 @@ export default function App() {
         <header>
           <h1>PanelPath</h1>
           <Nav page={page} />
+          <form className="search" role="search" onSubmit={(e) => {
+            e.preventDefault();
+            const q = query.trim();
+            if (!/^\d{3,4}$/.test(q)) return setSearchMsg("Enter a 3 or 4 digit postcode.");
+            const code = q.padStart(4, "0");
+            if (!data.area[code]) return setSearchMsg(`No postal area for ${code}. PO box and business-only postcodes aren't mapped.`);
+            setSearchMsg("");
+            setSelection({ kind: "poa", code });
+            setFocus({ code, seq: (focus?.seq ?? 0) + 1 });
+          }}>
+            <input type="search" inputMode="numeric" maxLength={4} placeholder="Find a postcode, e.g. 2765"
+              aria-label="Postcode" value={query} onChange={(e) => { setQuery(e.target.value); setSearchMsg(""); }} />
+            <button type="submit">Find</button>
+          </form>
+          {searchMsg && <p className="search-msg" role="status">{searchMsg}</p>}
           <p>Where and when Australia's rooftop solar panels come off roofs, and where {data.coverage.settings.n_sites} collection sites would catch the most waste.</p>
         </header>
 
@@ -159,7 +177,7 @@ export default function App() {
 
       <main className="main">
         <MapView data={data} scenario={scenario} year={year} values={byYear[String(year)] ?? {}} breaks={breaks}
-          selection={selection} onSelect={setSelection} />
+          selection={selection} onSelect={setSelection} focus={focus} />
         {selection && <Panel data={data} scenario={scenario} year={year} selection={selection} onSelect={setSelection} />}
       </main>
     </div>

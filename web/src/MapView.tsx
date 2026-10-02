@@ -4,6 +4,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import workerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
 import { useEffect, useRef, useState } from "react";
 import { fmtSig, fmtT, type Data, type Scenario } from "./data";
+import type { Geometry } from "geojson";
 import type { Selection } from "./Panel";
 
 // OpenFreeMap Positron: free, no key; its OpenStreetMap attribution is shown by MapLibre from the style.
@@ -49,12 +50,23 @@ interface Props {
   breaks: number[];
   selection: Selection | null;
   onSelect: (s: Selection | null) => void;
+  /** Postcode to fly to; `seq` changes on every search so the same postcode can be found twice. */
+  focus: { code: string; seq: number } | null;
 }
 
-export default function MapView({ data, scenario, year, values, breaks, selection, onSelect }: Props) {
+/** [[west, south], [east, north]] of a polygon or multipolygon. */
+function bounds(geometry: Geometry): [[number, number], [number, number]] {
+  const pts = (geometry.type === "Polygon" ? [geometry.coordinates] : geometry.type === "MultiPolygon" ? geometry.coordinates : [])
+    .flat(2) as number[][];
+  const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
+  return [[Math.min(...xs), Math.min(...ys)], [Math.max(...xs), Math.max(...ys)]];
+}
+
+export default function MapView({ data, scenario, year, values, breaks, selection, onSelect, focus }: Props) {
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MLMap | null>(null);
   const [ready, setReady] = useState(false);
+  const userMoved = useRef(false);
   const [hover, setHover] = useState<{ x: number; y: number; title: string; value: string } | null>(null);
   const latest = useRef({ data, scenario, year, onSelect });
   latest.current = { data, scenario, year, onSelect };
@@ -70,12 +82,11 @@ export default function MapView({ data, scenario, year, values, breaks, selectio
     mapRef.current = map;
     map.addControl(new NavigationControl({ showCompass: false }), "top-right");
     // Re-fit Australia when the window resizes, until the user pans or zooms the map themselves.
-    let userMoved = false;
-    const moved = () => { userMoved = true; };
+    const moved = () => { userMoved.current = true; };
     map.on("dragstart", moved);
     map.on("zoomstart", (e) => { if (e.originalEvent) moved(); }); // buttons, double-click, keyboard
     map.getCanvasContainer().addEventListener("wheel", moved, { passive: true }); // scroll zoom has no originalEvent
-    map.on("resize", () => { if (!userMoved) map.fitBounds(AUSTRALIA, { padding: 24, animate: false }); });
+    map.on("resize", () => { if (!userMoved.current) map.fitBounds(AUSTRALIA, { padding: 24, animate: false }); });
 
     map.on("load", () => {
       const { data } = latest.current;
@@ -160,6 +171,17 @@ export default function MapView({ data, scenario, year, values, breaks, selectio
     map.setPaintProperty("sites", "circle-radius",
       ["interpolate", ["linear"], ["sqrt", ["get", "t"]], 0, 3, Math.sqrt(max), 17]);
   }, [ready, data, scenario, year]);
+
+  // Fly to a searched postcode, leaving room for the details panel on wide screens.
+  useEffect(() => {
+    const map = mapRef.current;
+    const f = focus && data.poa.features.find((x) => x.properties.poa_code === focus.code);
+    if (!ready || !map || !f) return;
+    userMoved.current = true;
+    const wide = map.getContainer().clientWidth > 760;
+    map.fitBounds(bounds(f.geometry), { padding: wide ? { top: 60, bottom: 60, left: 390, right: 70 } : 40, maxZoom: 11,
+      duration: 1200 });
+  }, [ready, data, focus]);
 
   // Outline the selected postcode.
   const selectedPoa = selection?.kind === "poa" ? selection.code : null;
