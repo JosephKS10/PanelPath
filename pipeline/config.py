@@ -73,7 +73,10 @@ SCENARIOS = {
     "INTL_REGULAR": {"beta": 30.0, "alpha": 5.3759},  # IRENA/IEA-PVPS 2016, regular loss [13]
     "FITTED": {"beta": None, "alpha": 2.4928},  # beta fitted in step 6 (§6.4); alpha from [11]
 }
-FALLBACK_SCENARIO = "AU_RES"  # used where FITTED is not available yet, §6.5
+# Optimiser demand weights. §6.5 defaults to FITTED, but the fit lands at 0.3-0.5x reported national waste while
+# AU_RES matches it (step 5), so the team chose AU_RES on 2026-10-03. FITTED runs as a robustness check.
+DEFAULT_SCENARIO = "AU_RES"
+OPTIMISER_SCENARIOS = ("AU_RES", "FITTED")
 
 # --- Panel watts and mass by install year, §7 ---------------------------------
 # (last install year inclusive, watts per panel, kg per panel). Starting estimates
@@ -133,6 +136,13 @@ N_SITES = 100  # pilot target of about 100 sites [6]
 MIN_SITES_PER_STATE = 2
 SITE_DEDUPE_M = 100.0  # merge candidate facilities closer than this, BUILD_PLAN step 7
 EXACT_SOLVER_TIME_LIMIT_S = 120
+SITE_YEARS = (2026, 2035)  # inclusive; per-site tonnes and panels reported for these years, §6.5
+# GA FACILITY_INFRASTRUCTURE_TYPE values where a household could plausibly drop off panels (definitions from the
+# GA metadata PDF, eCat 147594). Transfer stations and putrescible landfills are council drop-off sites (the EU
+# study [20] recommends co-locating with council facilities); e-waste drop-offs include retailers it also
+# recommends. Excluded: soft-plastics bins, container deposit depots, MRFs, reprocessors, inert landfills.
+CANDIDATE_TYPES = ("TRANSFER STATION", "LANDFILL – PUTRESCIBLE", "E-WASTE DROP-OFF FACILITY",
+                   "E-WASTE RECYCLING FACILITY")
 
 # --- Web data budget (CLAUDE.md code style) -------------------------------------
 WEB_DATA_MAX_MB = 15.0

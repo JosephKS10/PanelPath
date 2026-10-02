@@ -2,7 +2,7 @@
 import argparse
 import logging
 
-from pipeline import clean_cer, cohorts, geography, replacement_fit, retirement, validate
+from pipeline import clean_cer, cohorts, geography, optimiser, replacement_fit, retirement, validate
 
 log = logging.getLogger("pipeline")
 
@@ -20,7 +20,7 @@ STAGES = {
     "cohorts": cohorts.run,
     "fit": replacement_fit.run,
     "retire": retirement.run,
-    "optimise": _stub("optimise"),
+    "optimise": optimiser.run,
     "validate": validate.run,
     "export": _stub("export"),
 }
