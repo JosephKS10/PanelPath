@@ -1,4 +1,6 @@
 """Stage retire: Weibull retirements per POA, year and scenario -> data/processed/retirements.parquet."""
+import json
+
 import numpy as np
 import pandas as pd
 
@@ -31,12 +33,21 @@ def retirements(cohorts: pd.DataFrame, years: np.ndarray, beta: float, alpha: fl
     return pd.DataFrame(cols).rename_axis(["poa_code", "year"]).reset_index()
 
 
+def scenario_params() -> dict:
+    """SCENARIOS with FITTED's beta filled in from fit_report.json once the fit stage has run."""
+    params = {name: dict(s) for name, s in SCENARIOS.items()}
+    report = PROCESSED / "fit_report.json"
+    if report.exists():
+        params["FITTED"]["beta"] = json.loads(report.read_text())["beta"]
+    return params
+
+
 def run() -> None:
     """Write retirements.parquet and national_retirements.parquet, and print national checks."""
     cohorts = pd.read_parquet(INTERIM / "cohorts.parquet")
     years = np.arange(FORECAST_YEARS[0], FORECAST_YEARS[1] + 1)
     frames, ever = [], {}
-    for name, s in SCENARIOS.items():
+    for name, s in scenario_params().items():
         if s["beta"] is None:
             print(f"{name}: beta not set yet (fitted in step 6), skipped")
             continue

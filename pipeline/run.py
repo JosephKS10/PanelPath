@@ -2,7 +2,7 @@
 import argparse
 import logging
 
-from pipeline import clean_cer, cohorts, geography, retirement, validate
+from pipeline import clean_cer, cohorts, geography, replacement_fit, retirement, validate
 
 log = logging.getLogger("pipeline")
 
@@ -13,14 +13,17 @@ def _stub(name: str):
     return run
 
 
-# Order matters for --stage all. Replace each stub with the real module's run() as steps land.
-STAGES = {name: _stub(name) for name in
-          ["clean", "geography", "cohorts", "retire", "fit", "optimise", "validate", "export"]}
-STAGES["clean"] = clean_cer.run
-STAGES["geography"] = geography.run
-STAGES["cohorts"] = cohorts.run
-STAGES["retire"] = retirement.run
-STAGES["validate"] = validate.run
+# Order matters for --stage all: fit runs before retire so FITTED gets its beta. Stubs are replaced as steps land.
+STAGES = {
+    "clean": clean_cer.run,
+    "geography": geography.run,
+    "cohorts": cohorts.run,
+    "fit": replacement_fit.run,
+    "retire": retirement.run,
+    "optimise": _stub("optimise"),
+    "validate": validate.run,
+    "export": _stub("export"),
+}
 
 
 def main() -> None:

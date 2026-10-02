@@ -113,12 +113,19 @@ UNIT_ERROR_RATIO = 3.0  # §9: if every scenario is more than 3x off a target, s
 SCENARIO_COLORS = {"AU_RES": "#2a78d6", "INTL_EARLY": "#eb6834", "INTL_REGULAR": "#1baf7a", "FITTED": "#eda100"}
 
 # --- Lifetime fit, §6.4 and §7 --------------------------------------------------
-FIT_CUTOFF = date(2021, 8, 10)  # Census night 2021
+# §6.4 counts installs to Census night 2021, but then only 3 POAs (all SA) have more installs than houses
+# (national penetration was 43.5%). Team decision 2026-10-03: the main fit counts installs to the end of the
+# last non-provisional CER month (None below) against 2021 dwellings; Census night is kept as a sensitivity.
+# This adds post-2021 new homes to the excess, which biases beta down (CONTEXT §6.4 caveats).
+FIT_CUTOFF = None  # None = end of the last non-provisional CER month
+FIT_SENSITIVITY_CUTOFFS = (date(2021, 8, 10), date(2023, 8, 10))  # Census night 2021, and two years on
+FIT_ALPHA = 2.4928  # shape held fixed at the UNSW value [11], §6.4
 FIT_BETA_GRID = (10.0, 35.0, 0.25)  # start, stop (inclusive), step
-FIT_MIN_HOUSES = 500
+FIT_MIN_HOUSES = 500  # applied to the denominator (houses, or houses + semis in the sensitivity run)
 FIT_MAX_MEAN_KW = 15.0  # drop business-heavy POAs above this mean system size
 FIT_MEAN_KW_YEARS = (2016, 2021)  # window for the mean system size filter
 FIT_SENSITIVITY_MAX_MEAN_KW = (10.0, 20.0)  # BUILD_PLAN step 6
+FIT_CROSS_CHECK_YEARS = (2024, 2025)  # implied replacement share of installs, vs "over a third in some states" [12]
 
 # --- Site optimiser, §6.5 and §7 ------------------------------------------------
 COVERAGE_RADIUS_KM = 30.0

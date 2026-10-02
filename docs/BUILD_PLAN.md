@@ -12,7 +12,7 @@ Work through the steps in order. Each step lists what to build, what it writes, 
 - [x] 3 Geography and dwellings
 - [x] 4 Cohorts, tonnes and retirements
 - [x] 5 National validation
-- [ ] 6 Lifetime fit (the creative twist)
+- [x] 6 Lifetime fit (the creative twist)
 - [ ] 7 Site optimiser and capitals-only baseline
 - [ ] 8 Export web data
 - [ ] 9 Map MVP
