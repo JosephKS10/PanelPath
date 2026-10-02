@@ -31,7 +31,7 @@ Where a postcode has more solar installs than houses, the excess is mostly repla
 
 | File | Contents |
 |---|---|
-| `poa.geojson` | 2,641 postal areas (ABS POA 2021), simplified to 500 m for the web, EPSG:4326. Properties: `poa_code`, `state`. |
+| `poa.geojson` | 2,641 postal areas (ABS POA 2021), simplified to 500 m for the web, EPSG:4326. Properties: `poa_code`, `state`, `area_km2` (from the full-resolution polygon). |
 | `retirements.json` | `{scenario: {year: {poa_code: tonnes}}}` for the scenarios `AU_RES`, `FITTED`, `INTL_EARLY` and `INTL_REGULAR`, for 2015 to 2035. Tonnes are rounded to 0.1, and a missing postcode means 0. |
 | `sites_<scenario>.geojson` | The 100 chosen collection sites (points, EPSG:4326). The top-level `years` array lists 2026 to 2035. Properties: `rank` (the order the site was picked), `id` (GA record ID), `name`, `owner`, `type` (GA facility types, separated by `; `), `state`, `suburb`, `in_capital`, `tonnes` and `panels` (arrays aligned with `years`), and `poas` (covered postal areas whose nearest site this is). |
 | `coverage.json` | One entry per scenario, holding `demand_tonnes` and three site sets: `optimised`, `capitals_only` and `exact`. Each set has `sites`, `covered_tonnes`, `covered_pct`, `covered_poas` and `mean_distance_km`. The `exact` entry also holds the solver status and `greedy_vs_exact_pct`. The file also has `robustness`, which compares site choices across scenarios, and `settings`. |

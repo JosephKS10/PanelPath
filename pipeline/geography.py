@@ -88,7 +88,8 @@ def run() -> None:
           f"{unmatched['kw'].sum() / cer['kw'].sum():.3%} of national kW -> {QA / 'unmatched_postcodes.csv'}")
 
     # ponytail: per-polygon simplify leaves hairline gaps between neighbours; use mapshaper/topojson if visible.
-    web = gpd.GeoDataFrame({"poa_code": out["poa_code"], "state": out["state"]},
+    # area_km2 (full-resolution, EPSG:3577) lets the map shade waste density, t per km2.
+    web = gpd.GeoDataFrame({"poa_code": out["poa_code"], "state": out["state"], "area_km2": out["area_km2"].round(3)},
                            geometry=poa.geometry.simplify(POA_SIMPLIFY_M), crs=CRS_METRIC).to_crs(CRS_STORE)
     path = INTERIM / "poa_simplified.geojson"
     path.unlink(missing_ok=True)

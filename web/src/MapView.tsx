@@ -3,7 +3,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 // MapLibre 6 looks for its worker next to its own module, which Vite moves; point it at Vite's bundled worker.
 import workerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
 import { useEffect, useRef, useState } from "react";
-import { fmtT, type Data, type Scenario } from "./data";
+import { fmtSig, fmtT, type Data, type Scenario } from "./data";
 import type { Selection } from "./Panel";
 
 // OpenFreeMap Positron: free, no key; its OpenStreetMap attribution is shown by MapLibre from the style.
@@ -14,7 +14,17 @@ const AUSTRALIA: [[number, number], [number, number]] = [[112, -44.5], [154.5, -
 export const RAMP = ["#cde2fb", "#9ec5f4", "#6da7ec", "#3987e5", "#256abf", "#184f95", "#0d366b"];
 export const SITE_COLOR = "#eb6834";
 
-const twoSig = (v: number) => (v >= 10 ? Math.round(v) : Number(v.toPrecision(2)));
+const twoSig = (v: number) => Number(v.toPrecision(2));
+
+/** What the postcode shading shows: waste density (kg per km2) or total tonnes. */
+export type Metric = "density" | "total";
+
+/** poa_code -> shaded value for one scenario-year. */
+export function shadeValues(data: Data, scenario: Scenario, year: number, metric: Metric): Record<string, number> {
+  const tonnes = data.retirements[scenario][String(year)] ?? {};
+  if (metric === "total") return tonnes;
+  return Object.fromEntries(Object.entries(tonnes).map(([code, t]) => [code, (1000 * t) / (data.area[code] || Infinity)]));
+}
 
 /** Quantile class breaks over every postcode-year in `years`, so classes stay fixed as the year changes. */
 export function quantileBreaks(byYear: Record<string, Record<string, number>>, years: number[]): number[] {
@@ -34,12 +44,14 @@ interface Props {
   data: Data;
   scenario: Scenario;
   year: number;
+  /** poa_code -> shaded value for the selected year (see shadeValues). */
+  values: Record<string, number>;
   breaks: number[];
   selection: Selection | null;
   onSelect: (s: Selection | null) => void;
 }
 
-export default function MapView({ data, scenario, year, breaks, selection, onSelect }: Props) {
+export default function MapView({ data, scenario, year, values, breaks, selection, onSelect }: Props) {
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MLMap | null>(null);
   const [ready, setReady] = useState(false);
@@ -57,6 +69,13 @@ export default function MapView({ data, scenario, year, breaks, selection, onSel
     });
     mapRef.current = map;
     map.addControl(new NavigationControl({ showCompass: false }), "top-right");
+    // Re-fit Australia when the window resizes, until the user pans or zooms the map themselves.
+    let userMoved = false;
+    const moved = () => { userMoved = true; };
+    map.on("dragstart", moved);
+    map.on("zoomstart", (e) => { if (e.originalEvent) moved(); }); // buttons, double-click, keyboard
+    map.getCanvasContainer().addEventListener("wheel", moved, { passive: true }); // scroll zoom has no originalEvent
+    map.on("resize", () => { if (!userMoved) map.fitBounds(AUSTRALIA, { padding: 24, animate: false }); });
 
     map.on("load", () => {
       const { data } = latest.current;
@@ -104,7 +123,8 @@ export default function MapView({ data, scenario, year, breaks, selection, onSel
         }
         const code = String(f.properties.poa_code);
         const t = data.retirements[scenario][String(year)]?.[code] ?? 0;
-        setHover({ x: e.point.x, y: e.point.y, title: `Postcode ${code}`, value: `${fmtT(t)} t in ${year}` });
+        setHover({ x: e.point.x, y: e.point.y, title: `Postcode ${code} · ${fmtSig((1000 * t) / (data.area[code] || Infinity))} kg per km²`,
+          value: `${fmtT(t)} t in ${year}` });
       });
       map.on("mouseout", () => setHover(null));
       setReady(true);
@@ -112,15 +132,14 @@ export default function MapView({ data, scenario, year, breaks, selection, onSel
     return () => map.remove();
   }, []);
 
-  // Shade postcodes for the selected scenario and year.
+  // Shade postcodes with the selected scenario-year values.
   useEffect(() => {
     const map = mapRef.current;
     if (!ready || !map) return;
-    const values = data.retirements[scenario][String(year)] ?? {};
     for (const f of data.poa.features) {
       map.setFeatureState({ source: "poa", id: f.properties.poa_code }, { t: values[f.properties.poa_code] ?? 0 });
     }
-  }, [ready, data, scenario, year]);
+  }, [ready, data, values]);
 
   useEffect(() => {
     if (ready) mapRef.current!.setPaintProperty("poa-fill", "fill-color", fillColor(breaks));

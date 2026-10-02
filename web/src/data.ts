@@ -53,7 +53,9 @@ export interface Assumptions {
 export type Retirements = Record<Scenario, Record<string, Record<string, number>>>;
 
 export interface Data {
-  poa: FeatureCollection<Geometry, { poa_code: string; state: string }>;
+  poa: FeatureCollection<Geometry, { poa_code: string; state: string; area_km2: number }>;
+  /** poa_code -> area in km2, from poa.geojson. */
+  area: Record<string, number>;
   retirements: Retirements;
   sites: Record<Scenario, Sites>;
   coverage: Coverage;
@@ -78,6 +80,7 @@ export async function loadData(): Promise<Data> {
   ] as const);
   return {
     poa: poa as Data["poa"],
+    area: Object.fromEntries((poa as Data["poa"]).features.map((f) => [f.properties.poa_code, f.properties.area_km2])),
     retirements: retirements as Retirements,
     coverage: coverage as Coverage,
     cohorts: cohorts as Cohorts,
@@ -91,3 +94,7 @@ export const fmt = (v: number, digits = 0) =>
 
 /** Tonnes with sensible precision: 0.4 t, 12 t, 1,234 t. */
 export const fmtT = (v: number) => fmt(v, v > 0 && v < 10 ? 1 : 0);
+
+/** Two significant figures below 10 (0.0042, 3.1), whole numbers above. */
+export const fmtSig = (v: number) =>
+  v >= 10 || v === 0 ? fmt(v) : v.toLocaleString("en-AU", { maximumSignificantDigits: 2 });
