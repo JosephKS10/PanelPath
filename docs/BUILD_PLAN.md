@@ -7,7 +7,7 @@ Work through the steps in order. Each step lists what to build, what it writes, 
 ## Status
 
 - [x] 0 Scaffold
-- [ ] 1 Download
+- [x] 1 Download
 - [ ] 2 Clean CER data
 - [ ] 3 Geography and dwellings
 - [ ] 4 Cohorts, tonnes and retirements

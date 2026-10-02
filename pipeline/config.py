@@ -21,6 +21,30 @@ SOURCE_PAGES = {
     "ga_waste_atlas": "https://digital.atlas.gov.au/datasets/waste-management-facilities-1",  # [18]
 }
 
+# Direct file links, copied from the pages above on 2026-10-03. Filename in data/raw/ -> URL.
+_CER = "https://cer.gov.au/document/"
+_ASGS = ("https://www.abs.gov.au/statistics/standards/australian-statistical-geography-standard-asgs/"
+         "edition-3-july-2021-june-2026/access-and-downloads/digital-boundary-files/")
+_GA = "https://d28rz98at9flks.cloudfront.net/147594/"
+DOWNLOADS = {
+    # CER SGU solar (small generation units, PV only): counts and kW, split 2001-2010 and 2011-present.
+    "cer_solar_installations_2001_2010.csv": _CER + "sgu-solar-installations-2001-to-2010",
+    "cer_solar_installations_2011_present.csv": _CER + "sgu-solar-installations-2011-to-present-and-totals",
+    "cer_solar_capacity_2001_2010.csv": _CER + "sgu-solar-capacity-2001-to-2010",
+    "cer_solar_capacity_2011_present.csv": _CER + "sgu-solar-capacity-2011-to-present-and-totals",
+    # ABS ASGS Edition 3 boundaries, GDA2020 shapefiles.
+    "POA_2021_AUST_GDA2020_SHP.zip": _ASGS + "POA_2021_AUST_GDA2020_SHP.zip",
+    "GCCSA_2021_AUST_SHP_GDA2020.zip": _ASGS + "GCCSA_2021_AUST_SHP_GDA2020.zip",
+    "STE_2021_AUST_SHP_GDA2020.zip": _ASGS + "STE_2021_AUST_SHP_GDA2020.zip",
+    # ABS Census 2021 General Community Profile, POA level, all of Australia.
+    "2021_GCP_POA_for_AUS_short-header.zip":
+        "https://www.abs.gov.au/census/find-census-data/datapacks/download/2021_GCP_POA_for_AUS_short-header.zip",
+    # GA Waste Management Facilities Database (eCat 147594, CC BY 4.0). Layer is named
+    # "Waste_Management_Facilities_2025", newer than the 2022 update cited in CONTEXT [17]. GeoJSON + field defs PDF.
+    "ga_waste_facilities.geojson": _GA + "147594_00_1.json",
+    "ga_waste_facilities_metadata.pdf": _GA + "147594_04_3.pdf",
+}
+
 # --- Coordinate systems (CLAUDE.md modelling rules) ---------------------------
 CRS_STORE = "EPSG:4326"  # storage
 CRS_METRIC = "EPSG:3577"  # GDA94 / Australian Albers, metres, for distances and areas

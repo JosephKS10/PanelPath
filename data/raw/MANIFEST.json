@@ -1,0 +1,62 @@
+{
+  "cer_solar_installations_2001_2010.csv": {
+    "url": "https://cer.gov.au/document/sgu-solar-installations-2001-to-2010",
+    "download_date": "2026-10-03",
+    "sha256": "85046bebc4a8c19238f0e406a2fc20862e1a0922fc36814c189b5670b5e51dd2",
+    "bytes": 685667
+  },
+  "cer_solar_installations_2011_present.csv": {
+    "url": "https://cer.gov.au/document/sgu-solar-installations-2011-to-present-and-totals",
+    "download_date": "2026-10-03",
+    "sha256": "9e1f03a959fec5dbcd56692953dfaa9cee4a0b761f8d19da8e5e19fc7bbbd5b5",
+    "bytes": 1230096
+  },
+  "cer_solar_capacity_2001_2010.csv": {
+    "url": "https://cer.gov.au/document/sgu-solar-capacity-2001-to-2010",
+    "download_date": "2026-10-03",
+    "sha256": "8aee6a245e79f87437f79aaefdd390b7db431cecede7a36d6055d12d68d7ff75",
+    "bytes": 2005407
+  },
+  "cer_solar_capacity_2011_present.csv": {
+    "url": "https://cer.gov.au/document/sgu-solar-capacity-2011-to-present-and-totals",
+    "download_date": "2026-10-03",
+    "sha256": "5d07e6ce5fa90fd8b377a4bfe6c094d0b7f0ee110d60d790d9b845b5e2f53f9a",
+    "bytes": 3624389
+  },
+  "POA_2021_AUST_GDA2020_SHP.zip": {
+    "url": "https://www.abs.gov.au/statistics/standards/australian-statistical-geography-standard-asgs/edition-3-july-2021-june-2026/access-and-downloads/digital-boundary-files/POA_2021_AUST_GDA2020_SHP.zip",
+    "download_date": "2026-10-03",
+    "sha256": "92182d5e491a2dc0d49bd282283722701eef8a347ae072c04c344b4aeac2c49a",
+    "bytes": 55939167
+  },
+  "GCCSA_2021_AUST_SHP_GDA2020.zip": {
+    "url": "https://www.abs.gov.au/statistics/standards/australian-statistical-geography-standard-asgs/edition-3-july-2021-june-2026/access-and-downloads/digital-boundary-files/GCCSA_2021_AUST_SHP_GDA2020.zip",
+    "download_date": "2026-10-03",
+    "sha256": "cc48b928d33ccd90cebd556e2cce696b132ac86519b7416588e011394e4518e7",
+    "bytes": 22547653
+  },
+  "STE_2021_AUST_SHP_GDA2020.zip": {
+    "url": "https://www.abs.gov.au/statistics/standards/australian-statistical-geography-standard-asgs/edition-3-july-2021-june-2026/access-and-downloads/digital-boundary-files/STE_2021_AUST_SHP_GDA2020.zip",
+    "download_date": "2026-10-03",
+    "sha256": "d9b7f735de6085b37414faf011f796dda3c7f768c55e9dce01f96e790f399a21",
+    "bytes": 21559880
+  },
+  "2021_GCP_POA_for_AUS_short-header.zip": {
+    "url": "https://www.abs.gov.au/census/find-census-data/datapacks/download/2021_GCP_POA_for_AUS_short-header.zip",
+    "download_date": "2026-10-03",
+    "sha256": "ccca4c72ee769d81c13dd6cfaedff7df58819267384195118f3d3b87d6c64008",
+    "bytes": 38014906
+  },
+  "ga_waste_facilities.geojson": {
+    "url": "https://d28rz98at9flks.cloudfront.net/147594/147594_00_1.json",
+    "download_date": "2026-10-03",
+    "sha256": "7b7597177413bdfb0c0b1123e6d2eb9e57e41d069f4c6ea4274ead8f07dd1d2c",
+    "bytes": 7521334
+  },
+  "ga_waste_facilities_metadata.pdf": {
+    "url": "https://d28rz98at9flks.cloudfront.net/147594/147594_04_3.pdf",
+    "download_date": "2026-10-03",
+    "sha256": "965c01a0cdcb237a63c3df5bbdf9a36ef3dc7c78af9daaec790a3954bbe47985",
+    "bytes": 146000
+  }
+}
