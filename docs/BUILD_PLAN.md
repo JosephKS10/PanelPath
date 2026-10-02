@@ -10,7 +10,7 @@ Work through the steps in order. Each step lists what to build, what it writes, 
 - [x] 1 Download
 - [x] 2 Clean CER data
 - [x] 3 Geography and dwellings
-- [ ] 4 Cohorts, tonnes and retirements
+- [x] 4 Cohorts, tonnes and retirements
 - [ ] 5 National validation
 - [ ] 6 Lifetime fit (the creative twist)
 - [ ] 7 Site optimiser and capitals-only baseline

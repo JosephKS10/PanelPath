@@ -2,7 +2,7 @@
 import argparse
 import logging
 
-from pipeline import clean_cer, geography
+from pipeline import clean_cer, cohorts, geography, retirement
 
 log = logging.getLogger("pipeline")
 
@@ -18,6 +18,8 @@ STAGES = {name: _stub(name) for name in
           ["clean", "geography", "cohorts", "retire", "fit", "optimise", "validate", "export"]}
 STAGES["clean"] = clean_cer.run
 STAGES["geography"] = geography.run
+STAGES["cohorts"] = cohorts.run
+STAGES["retire"] = retirement.run
 
 
 def main() -> None:
