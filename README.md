@@ -6,7 +6,7 @@ PanelPath forecasts end-of-life solar panels postcode by postcode, measures how 
 
 ![PanelPath map: panel waste per km² by postcode in 2030, with 100 optimised collection sites](outputs/figures/app_map.png)
 
-**Live site:** deployed on Netlify (TODO: add the URL). The chat server runs on Render; see [Deploy](#deploy).
+**Live site:** https://panelpath12.netlify.app (Netlify). The chat server runs on Render; see [Deploy](#deploy).
 
 ## The problem
 

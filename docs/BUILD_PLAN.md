@@ -18,8 +18,8 @@ Work through the steps in order. Each step lists what to build, what it writes, 
 - [x] 9 Map MVP
 - [x] 10 Validation and method pages
 - [x] 11 Materials layer (stretch)
-- [ ] 12 Polish and submission (deploying to GitHub Pages; tick once the live site and the fresh-clone check pass)
-- [ ] 13 Ask the data (chat), added after the plan: built and tested, 25 of 25 eval questions pass; waiting on the Render and Netlify deploy
+- [x] 12 Polish and submission: live at https://panelpath12.netlify.app
+- [x] 13 Ask the data (chat), added after the plan: 25 of 25 eval questions pass; live on Render, locked to the Netlify site, and the live site answers 283 t for 2765 in 2030
 
 ## Step 0: Scaffold (30 min)
 
