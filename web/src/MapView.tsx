@@ -172,7 +172,7 @@ export default function MapView({ data, scenario, year, values, breaks, selectio
         t: f.properties.tonnes[i] } })),
     });
     map.setPaintProperty("sites", "circle-radius",
-      ["interpolate", ["linear"], ["sqrt", ["get", "t"]], 0, 3, Math.sqrt(max), 17]);
+      ["interpolate", ["linear"], ["sqrt", ["get", "t"]], 0, 2.5, Math.sqrt(max), 12]);
   }, [ready, data, scenario, year]);
 
   // Fly to a searched postcode, leaving room for the details panel on wide screens.

@@ -10,3 +10,6 @@ __pycache__/
 # Locally installed agent skills (bundled music licence unverified; not part of PanelPath)
 .claude/skills/
 skills-lock.json
+
+# Browser automation logs
+.playwright-cli/

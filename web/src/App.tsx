@@ -62,7 +62,7 @@ export default function App() {
   );
   const breaks = useMemo(() => quantileBreaks(byYear, years), [byYear, years]);
   const fmtClass = metric === "density" ? fmtSig : fmtT;
-  const unit = metric === "density" ? "kg per km²" : "t";
+  const unit = metric === "density" ? "kg per km²" : "tonnes";
 
   if (error) return <div className="status error">Could not load PanelPath data: {error}</div>;
   if (!data) return <div className="status">Loading data…</div>;
@@ -81,12 +81,19 @@ export default function App() {
   const { radius_km, demand_years } = data.coverage.settings;
   const beta = (s: Scenario) => data.assumptions.scenarios.find((x) => x.name === s)?.beta;
 
+  const classes = breaks.length + 1;
+  const tick = (v: number) => (v >= 1000 ? `${+(v / 1000).toPrecision(2)}k` : fmtClass(v));
+  const months = (ym: string) => new Date(`${ym}-01T00:00`).toLocaleDateString("en-AU", { month: "long", year: "numeric" });
+
   return (
     <div className="app">
       <aside className="sidebar">
-        <header>
-          <h1>PanelPath</h1>
+        <div className="brand-row">
+          <h1 className="wordmark">PanelPath</h1>
           <Nav page={page} />
+        </div>
+
+        <div className="block">
           <form className="search" role="search" onSubmit={(e) => {
             e.preventDefault();
             const q = query.trim();
@@ -97,82 +104,86 @@ export default function App() {
             setSelection({ kind: "poa", code });
             setFocus({ code, seq: (focus?.seq ?? 0) + 1 });
           }}>
-            <input type="search" inputMode="numeric" maxLength={4} placeholder="Find a postcode, e.g. 2765"
+            <input type="search" inputMode="numeric" maxLength={4} placeholder="Search a postcode, e.g. 2765"
               aria-label="Postcode" value={query} onChange={(e) => { setQuery(e.target.value); setSearchMsg(""); }} />
             <button type="submit">Find</button>
           </form>
           {searchMsg && <p className="search-msg" role="status">{searchMsg}</p>}
-          <p>Where and when Australia's rooftop solar panels come off roofs, and where {data.coverage.settings.n_sites} collection sites would catch the most waste.</p>
-        </header>
+        </div>
 
-        <fieldset className="scenarios">
-          <legend>Panel lifetime scenario</legend>
-          {SCENARIOS.map((s) => (
-            <label key={s} className={s === scenario ? "on" : ""}>
-              <input type="radio" name="scenario" value={s} checked={s === scenario} onChange={() => setScenario(s)} />
-              <span>{SCENARIO_LABEL[s]}</span>
-              <small>{s === data.assumptions.default_scenario ? "default · " : ""}β {beta(s)} yr</small>
-            </label>
-          ))}
-        </fieldset>
-
-        <div className="year">
-          <label htmlFor="year">Year <strong>{year}</strong></label>
-          <div className="year-row">
-            <button
+        <div className="block year">
+          <label className="kicker" htmlFor="year">Year</label>
+          <div className="year-head">
+            <span className="year-value">{year}</span>
+            <button className="icon-btn" aria-label={playing ? "Pause" : "Play through the years"}
               onClick={() => {
                 if (!playing && year === last) setYear(first);
                 setPlaying(!playing);
-              }}
-              aria-label={playing ? "Pause" : "Play through the years"}
-            >
-              {playing ? "❚❚" : "▶"}
+              }}>
+              {playing
+                ? <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><rect x="2" y="1.5" width="3" height="9" rx=".5" fill="currentColor" /><rect x="7" y="1.5" width="3" height="9" rx=".5" fill="currentColor" /></svg>
+                : <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 1.5v9l7.5-4.5z" fill="currentColor" /></svg>}
             </button>
-            <input id="year" type="range" min={first} max={last} step={1} value={year}
-              onChange={(e) => { setPlaying(false); setYear(Number(e.target.value)); }} />
           </div>
+          <input id="year" type="range" min={first} max={last} step={1} value={year} aria-valuetext={`${year}, range ${first} to ${last}`}
+            onChange={(e) => { setPlaying(false); setYear(Number(e.target.value)); }} />
         </div>
 
-        <section className="cards">
-          <div className="card">
-            <p className="label">Panel waste retiring in {year}</p>
-            <p className="big">{fmt(national)} t</p>
-          </div>
-          <div className="card">
-            <p className="label">{demand_years[0]}–{demand_years[1]} waste within {radius_km} km of a site</p>
-            <div className="compare">
-              <div><p className="big">{fmt(cov.optimised.covered_pct, 1)}%</p><p className="sub">{cov.optimised.sites} optimised sites</p></div>
-              <div><p className="big dim">{fmt(cov.capitals_only.covered_pct, 1)}%</p><p className="sub">{cov.capitals_only.sites} capital-city sites</p></div>
+        <div className="block">
+          <p className="kicker">Panel waste retiring in {year}</p>
+          <p className="stat">{fmt(national)}<small>tonnes</small></p>
+          <div className="compare">
+            <p className="kicker">Waste retiring {demand_years[0]}–{demand_years[1]} within {radius_km} km of a site</p>
+            <div className="compare-row">
+              <span className="pct">{fmt(cov.optimised.covered_pct, 1)}%</span>
+              <span className="track"><i style={{ width: `${cov.optimised.covered_pct}%` }} /></span>
+              <span className="compare-label">{cov.optimised.sites} optimised sites</span>
             </div>
-            <p className="sub">Mean distance to nearest site {fmt(cov.optimised.mean_distance_km)} km vs {fmt(cov.capitals_only.mean_distance_km)} km</p>
+            <div className="compare-row dim">
+              <span className="pct">{fmt(cov.capitals_only.covered_pct, 1)}%</span>
+              <span className="track"><i style={{ width: `${cov.capitals_only.covered_pct}%` }} /></span>
+              <span className="compare-label">{cov.capitals_only.sites} sites in capital cities only</span>
+            </div>
           </div>
-        </section>
+          <p className="footnote">Mean distance to nearest site: {fmt(cov.optimised.mean_distance_km)} km vs {fmt(cov.capitals_only.mean_distance_km)} km</p>
+        </div>
 
-        <section className="legend" aria-label="Legend">
-          <div className="legend-head">
-            <p className="label">Shade by</p>
-            <div className="seg" role="group" aria-label="Shade postcodes by">
-              <button aria-pressed={metric === "density"} onClick={() => setMetric("density")}>Per km²</button>
-              <button aria-pressed={metric === "total"} onClick={() => setMetric("total")}>Total t</button>
-            </div>
-          </div>
-          <p className="label">{metric === "density" ? "Panel waste per km²" : "Tonnes retiring per postcode"} in {year}</p>
-          <ul>
-            {[0, ...breaks].map((b, i) => (
-              <li key={b}>
-                <span className="swatch" style={{ background: RAMP[i] }} />
-                {i < breaks.length ? `${fmtClass(b)} – ${fmtClass(breaks[i])} ${unit}` : `${fmtClass(b)} ${unit} and over`}
-              </li>
+        <div className="block">
+          <p className="kicker" id="scenario-label">Panel lifetime</p>
+          <fieldset className="options" aria-labelledby="scenario-label">
+            {SCENARIOS.map((s) => (
+              <label key={s} className={`option${s === scenario ? " on" : ""}`}>
+                <input type="radio" name="scenario" value={s} checked={s === scenario} onChange={() => setScenario(s)} />
+                <span>{SCENARIO_LABEL[s]}{s === data.assumptions.default_scenario ? " (default)" : ""}</span>
+                <small>{beta(s)} yr</small>
+              </label>
             ))}
-            <li><span className="dot" style={{ background: SITE_COLOR }} />Collection site, area = tonnes that year</li>
-          </ul>
-          <p className="sub">Classes are quantiles over {first}–{last}, fixed so you can watch the waste grow.</p>
-        </section>
+          </fieldset>
+        </div>
 
-        <footer>
-          Data: Clean Energy Regulator, ABS and Geoscience Australia (CC BY 4.0). Straight-line distances. Panels installed after{" "}
-          {new Date(`${data.assumptions.qa.last_install_month}-01T00:00`).toLocaleDateString("en-AU", { month: "long", year: "numeric" })} are not included.
-        </footer>
+        <div className="block">
+          <div className="legend-head">
+            <p className="kicker">{metric === "density" ? "Waste per km²" : "Tonnes per postcode"}, {year}</p>
+            <div className="toggle" role="group" aria-label="Shade postcodes by">
+              <button aria-pressed={metric === "density"} onClick={() => setMetric("density")}>Per km²</button>
+              <button aria-pressed={metric === "total"} onClick={() => setMetric("total")}>Total</button>
+            </div>
+          </div>
+          <div className="ramp" aria-hidden="true">{RAMP.slice(0, classes).map((c) => <span key={c} style={{ background: c }} />)}</div>
+          <div className="ramp-ticks" aria-hidden="true">
+            {breaks.map((b, i) => <span key={b} style={{ left: `${((i + 1) / classes) * 100}%` }}>{tick(b)}</span>)}
+          </div>
+          <p className="legend-unit">{unit}, classes fixed across {first}–{last}</p>
+          <p className="sr-only">
+            {[0, ...breaks].map((b, i) => (i < breaks.length ? `${fmtClass(b)} to ${fmtClass(breaks[i])} ${unit}` : `${fmtClass(b)} ${unit} and over`)).join("; ")}
+          </p>
+          <p className="site-key"><span className="site-dot" style={{ background: SITE_COLOR }} />Collection site, sized by tonnes that year</p>
+        </div>
+
+        <p className="foot">
+          Data: Clean Energy Regulator, ABS and Geoscience Australia (CC BY 4.0). Straight-line distances. Panels installed
+          after {months(data.assumptions.qa.last_install_month)} are not included.
+        </p>
       </aside>
 
       <main className="main">
