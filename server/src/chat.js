@@ -25,7 +25,10 @@ const NUMBER_CHECK = "Check every number in your answer with the tools before an
 const REFUSAL_TEXT = "I can't help with that one. I can answer questions about PanelPath's forecasts, collection sites and method.";
 
 let client; // created on first use, so the server can start (and report status) before a key is set
-const getClient = () => (client ??= new Anthropic({ timeout: 45_000, maxRetries: 1 }));
+// Keys that aren't scoped to a workspace must name one; a workspace-scoped key needs nothing extra.
+const workspace = process.env.ANTHROPIC_WORKSPACE_ID;
+const getClient = () => (client ??= new Anthropic({ timeout: 45_000, maxRetries: 1,
+  ...(workspace ? { defaultHeaders: { "anthropic-workspace-id": workspace } } : {}) }));
 
 /** Map context sent by the page (already validated) as a short line ahead of the question. */
 function contextLine(ctx) {

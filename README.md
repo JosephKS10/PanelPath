@@ -162,7 +162,7 @@ The map has an "Ask the data" panel where people can ask questions in plain Engl
 
 The site is static and goes on Netlify; the chat server goes on Render.
 
-1. **Anthropic.** Create an API key for PanelPath in the Anthropic Console, and set a monthly spend limit there as the hard ceiling.
+1. **Anthropic.** Create an API key for PanelPath in the Anthropic Console, ideally in its own workspace with a monthly spend limit as the hard ceiling. If your key isn't scoped to a workspace, also set `ANTHROPIC_WORKSPACE_ID`.
 2. **Chat server on Render.** In the Render dashboard choose New, then Blueprint, and connect this GitHub repo. Render reads `render.yaml`. When asked, paste `ANTHROPIC_API_KEY`; you can leave `ALLOWED_ORIGINS` empty for now.
    - **Without the Blueprint,** create a Web Service from the repo with these settings:
      - Runtime: Node. Region: Singapore. Root directory: blank.

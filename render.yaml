@@ -15,6 +15,8 @@ services:
         value: "22"
       - key: ANTHROPIC_API_KEY
         sync: false       # paste in the dashboard; never commit it
+      - key: ANTHROPIC_WORKSPACE_ID
+        sync: false       # only if the key isn't scoped to a workspace (wrkspc_...); leave empty otherwise
       - key: ALLOWED_ORIGINS
         sync: false       # your Netlify site, e.g. https://panelpath.netlify.app
       - key: CHAT_MODEL
