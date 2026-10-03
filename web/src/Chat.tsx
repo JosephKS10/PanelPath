@@ -9,6 +9,12 @@ interface Props { scenario: Scenario; year: number; postcode: string | null }
 
 const MAX_CHARS = 500;
 
+/** Inline text with **bold** spans rendered as <strong> (models sometimes add bold despite the prompt). */
+function Inline({ text }: { text: string }) {
+  return <>{text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
+    part.startsWith("**") && part.endsWith("**") ? <strong key={i}>{part.slice(2, -2)}</strong> : part)}</>;
+}
+
 /** Plain-text answer with "- " list lines rendered as a list. */
 function Answer({ text }: { text: string }) {
   const blocks: (string | string[])[] = [];
@@ -18,7 +24,9 @@ function Answer({ text }: { text: string }) {
       if (Array.isArray(last)) last.push(line.slice(2)); else blocks.push([line.slice(2)]);
     } else blocks.push(line);
   }
-  return <>{blocks.map((b, i) => (Array.isArray(b) ? <ul key={i}>{b.map((li, j) => <li key={j}>{li}</li>)}</ul> : <p key={i}>{b}</p>))}</>;
+  return <>{blocks.map((b, i) => (Array.isArray(b)
+    ? <ul key={i}>{b.map((li, j) => <li key={j}><Inline text={li} /></li>)}</ul>
+    : <p key={i}><Inline text={b} /></p>))}</>;
 }
 
 export default function Chat({ scenario, year, postcode }: Props) {

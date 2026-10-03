@@ -19,7 +19,7 @@ Work through the steps in order. Each step lists what to build, what it writes, 
 - [x] 10 Validation and method pages
 - [x] 11 Materials layer (stretch)
 - [ ] 12 Polish and submission (deploying to GitHub Pages; tick once the live site and the fresh-clone check pass)
-- [ ] 13 Ask the data (chat), added after the plan: built and unit-tested, waiting on `npm run eval` with the API key and the Render deploy
+- [ ] 13 Ask the data (chat), added after the plan: built and tested, 25 of 25 eval questions pass; waiting on the Render and Netlify deploy
 
 ## Step 0: Scaffold (30 min)
 

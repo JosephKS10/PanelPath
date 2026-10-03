@@ -259,3 +259,4 @@ button { font: inherit; color: inherit; cursor: pointer; }
   .chat { position: fixed; inset: auto 8px 8px 8px; top: auto; width: auto; height: 70vh; }
   .chat-open { position: fixed; right: 12px; bottom: 12px; }
 }
+.msg strong { color: var(--ink); font-weight: 600; }

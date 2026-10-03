@@ -188,8 +188,10 @@ const TOOLS = {
         national_rank_by_tonnes_in_year: rank > 0 ? `${rank} of ${values.length}` : "not ranked (no retirements)",
         tonnes_retiring_by_year: Object.fromEntries(d.retirementYears.map((yy) => [yy, fmtT(d.retirements[s][String(yy)]?.[code] ?? 0)])),
         recoverable_materials_2026_2035: d.materials.poa[s][code] ? materialsRow(d, d.materials.poa[s][code]) : null,
-        nearest_chosen_site: site ? { name: site.name, suburb: site.suburb, state: site.state } :
-          `none within ${d.coverage.settings.radius_km} km`,
+        nearest_chosen_site: site
+          ? { name: site.name, suburb: site.suburb, state: site.state,
+            distance: `within ${d.coverage.settings.radius_km} km of the postcode's centre (straight line); exact distances aren't in the data` }
+          : `none within ${d.coverage.settings.radius_km} km`,
       },
     };
   },
