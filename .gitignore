@@ -13,3 +13,8 @@ skills-lock.json
 
 # Browser automation logs
 .playwright-cli/
+
+# Secrets and local settings
+.env
+.env.*
+!.env.example

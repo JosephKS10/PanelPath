@@ -23,7 +23,8 @@ Before starting any build step, read these two files:
 ## Stack
 
 - **Pipeline:** Python 3.11 with pandas, numpy, pyarrow, geopandas, shapely, pyproj, scipy, matplotlib, pulp (optional exact solver), openpyxl and pytest.
-- **Frontend:** Vite, React, TypeScript and MapLibre GL JS. It is a static site that reads precomputed files from `web/public/data/`. There is no backend in the MVP.
+- **Frontend:** Vite, React, TypeScript and MapLibre GL JS. It is a static site that reads precomputed files from `web/public/data/`, deployed on Netlify (`netlify.toml`).
+- **Chat server ("Ask the data"):** Node 22 with no web framework and one dependency, `@anthropic-ai/sdk`. The model is Claude Sonnet 5.5 (`claude-sonnet-5-5`) with lookup tools over the same `web/public/data/` files. It is deployed on Render (`render.yaml`). Rate limiting and validation are hand-written; ask before adding packages.
 
 ## Layout
 
@@ -31,6 +32,7 @@ Before starting any build step, read these two files:
 - `data/raw/` holds downloads, `data/interim/` cleaned tables, `data/processed/` model outputs and `data/processed/qa/` the logs of dropped records.
 - `tests/` holds pytest tests. `notebooks/` is for throwaway exploration only and is never imported.
 - `web/` is the frontend, `docs/` the context and plan, and `outputs/figures/` the charts for the README and pitch.
+- `server/` is the chat server: `src/server.js` (HTTP, CORS, limits), `src/chat.js` (system prompt and tool loop), `src/tools.js` (the lookup tools), `src/data.js`, `src/limits.js`, `src/validate.js`. `test/` holds `node:test` tests and `eval/` the questions with answers taken from the data.
 
 ## Commands
 
@@ -38,7 +40,9 @@ Before starting any build step, read these two files:
 - **Download:** `python -m pipeline.download`
 - **Run all stages:** `python -m pipeline.run --stage all`. A single stage is one of `clean`, `geography`, `cohorts`, `retire`, `fit`, `optimise`, `validate` or `export`.
 - **Tests:** `pytest -q`. Run before every commit.
-- **Web:** `cd web && npm install && npm run dev`. Build with `npm run build`.
+- **Web:** `cd web && npm install && npm run dev`. Build with `npm run build`. Set `VITE_CHAT_API_URL` (see `web/.env.example`) to show the chat.
+- **Chat server:** `cd server && npm install`, then `npm test` (no API key needed) and `npm run dev` (reads `server/.env`; see `server/.env.example`).
+- **Chat eval:** `cd server && npm run eval`. This calls the real model, costs about 25 questions' worth, and needs `ANTHROPIC_API_KEY` in `server/.env`.
 
 ## Modelling rules
 
@@ -53,6 +57,15 @@ Before starting any build step, read these two files:
 - **Annual retirements.** For a cohort of size N, retirements in calendar year Y = N × (F(age at end of Y) - F(age at start of Y)), floored at 0.
 - **Counts vs mass.** Waste mass uses kW × kg-per-kW for the install year (table in config). Replacement fitting uses system counts, not kW.
 - **Test values.** `AU_RES` F(15) ≈ 0.519, `INTL_EARLY` F(15) ≈ 0.163, `INTL_REGULAR` F(15) ≈ 0.024.
+
+## Chat rules
+
+- **Numbers come from tools.** Every number the assistant gives must come from a tool in `server/src/tools.js`, which reads `web/public/data/`. Never put data figures in the system prompt, and never let the model answer numbers from memory.
+- **Tools match the map.** Tool outputs carry display strings formatted exactly as the map shows them. If a figure changes on the map, the tool must change with it; `server/test/tools.test.js` pins the key figures.
+- **Run the eval.** After any change to the system prompt, tools, model or effort, run `npm run eval` before deploying. Every question must pass. Add a question whenever a new kind of question comes up.
+- **The API key lives only in Render's environment** (or a local `server/.env`). Never put it in code, the repo or the frontend.
+- **Keep the guardrails on in production:** `ALLOWED_ORIGINS` set to the Netlify site, the rate limits, the daily cap, and a spend limit in the Anthropic Console.
+- **Two off switches:** `CHAT_ENABLED=false` on Render switches the assistant off, and leaving `VITE_CHAT_API_URL` unset hides the button.
 
 ## Code style
 

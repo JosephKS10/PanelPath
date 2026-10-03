@@ -6,7 +6,7 @@ PanelPath forecasts end-of-life solar panels postcode by postcode, measures how 
 
 ![PanelPath map: panel waste per km² by postcode in 2030, with 100 optimised collection sites](outputs/figures/app_map.png)
 
-**Live site:** https://josephks10.github.io/PanelPath/ (built and published by `.github/workflows/pages.yml` on every push to `main`).
+**Live site:** deployed on Netlify (TODO: add the URL). The chat server runs on Render; see [Deploy](#deploy).
 
 ## The problem
 
@@ -50,7 +50,10 @@ python -m pipeline.download          # about 160 MB of raw data into data/raw/, 
 python -m pipeline.run --stage all   # about 45 s; writes data/interim, data/processed and web/public/data
 pytest -q                            # 15 tests
 cd web && npm install && npm run dev # the map on http://localhost:5173 (npm run build for the static site)
+cd server && npm install && npm test # the chat server's 11 tests (no API key needed)
 ```
+
+To try "Ask the data" locally, copy `server/.env.example` to `server/.env` and add your API key. Then run `npm run dev` in `server/`, and start the site with `VITE_CHAT_API_URL=http://localhost:8787 npm run dev` in `web/`.
 
 The processed outputs are committed, so `cd web && npm install && npm run dev` works without running the pipeline.
 
@@ -127,7 +130,8 @@ Each raw file's URL, download date, sha256 and size are recorded in `data/raw/MA
 ## Libraries
 
 - **Pipeline (Python 3.11):** pandas 3.0.6, numpy 2.4.6, pyarrow 25.0.1, geopandas 1.2.0, shapely 2.1.2, pyproj 3.7.2, scipy 1.17.1, matplotlib 3.11.2, PuLP 3.3.2 (with its bundled CBC solver), openpyxl 3.1.5 and pytest 9.1.1.
-- **Web:** React 19.3, react-dom 19.3 and MapLibre GL JS 6.11, built with Vite 8.3, @vitejs/plugin-react 6.1 and TypeScript 7.0. There is no backend: the site reads precomputed files from `web/public/data/`.
+- **Web:** React 19.3, react-dom 19.3 and MapLibre GL JS 6.11, built with Vite 8.3, @vitejs/plugin-react 6.1 and TypeScript 7.0. The site reads precomputed files from `web/public/data/`.
+- **Chat server:** Node 22 and the Anthropic TypeScript SDK (`@anthropic-ai/sdk` 0.131) calling Claude Sonnet 5.5. No web framework; tests use the built-in `node:test`.
 
 ## Web data
 
@@ -144,6 +148,34 @@ Each raw file's URL, download date, sha256 and size are recorded in `data/raw/MA
 | `cohorts.json` | `years` (install years, 2001 to 2026), `provisional_from` (the first provisional month), `installs` (`{poa_code: [installs per year]}`) and `houses` (`{poa_code: occupied separate houses, Census 2021}`). |
 | `materials.json` | Tonnes of each material in panels retiring 2026 to 2035, with arrays in `keys` order: glass, aluminium, polymer, silicon, copper, tin and lead, and silver. Also holds `national`, `poa` and `sites` per scenario, plus `shares` (column [40] of the composition table in [21]), `silver_value_share` (IRENA and IEA-PVPS 2016, Figure 24) and `source`. |
 | `assumptions.json` | `scenarios` (β, α, source), `default_scenario`, `panel_table` (watts, kg per panel and kg per kW by install year, with source), `settings`, `data_sources` (publisher, URL, licence, attribution), `references` (the numbered works cited) and `qa` (data-quality figures). |
+
+## Ask the data
+
+The map has an "Ask the data" panel where people can ask questions in plain English, such as "How much panel waste will 2765 produce in 2030?", "Which state has the most?" or "How was the panel lifetime measured?". Claude Sonnet 5.5 answers, but it never answers numbers from memory:
+
+- **Lookup tools.** It has eight lookup tools in `server/src/tools.js`: national forecast, postcode profile, postcode rankings, state totals, collection sites, site coverage, lifetime fit, and method and sources. They read the same files as the map and return figures formatted exactly as the map shows them. The system prompt says every number must come from a tool, and the server re-asks once if an answer contains numbers without a lookup.
+- **Visible sources.** Every answer lists the data it used, for example "Postcode 2765 · AU_RES · 2030", so anyone can check it against the map.
+- **Checked against the data.** `server/eval/questions.json` holds 25 questions with answers taken from the data. They cover postcode figures, national and state totals, rankings, coverage, lifetimes, materials, an unmapped PO-box postcode, an out-of-range year, an off-topic question and a prompt-injection attempt. `npm run eval` must pass in full before a deploy.
+- **Guardrails.** The API key lives only on the server. Requests are accepted only from the site's origin, and there are per-visitor limits (6 a minute, 40 a day) and a daily cap for everyone (400). Questions are limited to 500 characters and conversations to 12 messages. The bot has no web or code access and only answers about PanelPath. Refused requests are retried on Anthropic's recommended fallback model. `CHAT_ENABLED=false` switches the assistant off without redeploying the site.
+
+## Deploy
+
+The site is static and goes on Netlify; the chat server goes on Render.
+
+1. **Anthropic.** Create an API key for PanelPath in the Anthropic Console, and set a monthly spend limit there as the hard ceiling.
+2. **Chat server on Render.** In the Render dashboard choose New, then Blueprint, and connect this GitHub repo. Render reads `render.yaml`. When asked, paste `ANTHROPIC_API_KEY`; you can leave `ALLOWED_ORIGINS` empty for now.
+   - **Without the Blueprint,** create a Web Service from the repo with these settings:
+     - Runtime: Node. Region: Singapore. Root directory: blank.
+     - Build command: `cd server && npm ci`
+     - Start command: `node server/src/server.js`
+     - Health check path: `/health`
+     - Environment variables: the ones in `server/.env.example`, plus `NODE_VERSION=22`.
+   - **Check it:** `https://<your-service>.onrender.com/health` should return `{"ok":true,"chat":true}`.
+3. **Site on Netlify.** Import the repo; `netlify.toml` already sets the base directory (`web`), build command and publish folder. Under Site configuration, then Environment variables, add `VITE_CHAT_API_URL=https://<your-service>.onrender.com`, then trigger a deploy.
+   - **Deploying by hand:** run `cd web && VITE_CHAT_API_URL=https://<your-service>.onrender.com npm run build` and drag `web/dist` onto the site's Deploys page.
+4. **Connect them.** In Render, set `ALLOWED_ORIGINS` to the Netlify address exactly, for example `https://panelpath.netlify.app`, with no trailing slash and commas between several. Save, and Render redeploys.
+5. **Check the whole thing.** Open the site, click "Ask the data" and ask "How much panel waste retires in postcode 2765 in 2030?". It should answer 283 t, with "Postcode 2765 · AU_RES · 2030" under it. A CORS error in the browser console means `ALLOWED_ORIGINS` doesn't exactly match the site's address.
+6. **Before a demo.** Render's free plan sleeps when idle, so open `/health` a minute before you start.
 
 ## Team
 

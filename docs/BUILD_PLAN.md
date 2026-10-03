@@ -19,6 +19,7 @@ Work through the steps in order. Each step lists what to build, what it writes, 
 - [x] 10 Validation and method pages
 - [x] 11 Materials layer (stretch)
 - [ ] 12 Polish and submission (deploying to GitHub Pages; tick once the live site and the fresh-clone check pass)
+- [ ] 13 Ask the data (chat), added after the plan: built and unit-tested, waiting on `npm run eval` with the API key and the Render deploy
 
 ## Step 0: Scaffold (30 min)
 
@@ -191,3 +192,9 @@ Check: from a fresh clone, setup → `python -m pipeline.run --stage all` → `n
 - **Optimiser:** step 7
 - **Frontend:** steps 8 to 10
 - **Pitch and submission:** step 12, the video and the README
+
+## Step 13: Ask the data (added after the plan)
+
+Build a chat panel that answers plain-English questions about PanelPath's data with Claude Sonnet 5.5. It has eight lookup tools over `web/public/data/` and every number must come from a tool. A small Node server on Render holds the API key and enforces the guardrails: an origin allowlist, per-visitor rate limits, a daily cap, input limits and an off switch.
+
+Check: `cd server && npm test` passes. `npm run eval` passes all 25 questions with answers taken from the data. The deployed site answers "How much panel waste retires in postcode 2765 in 2030?" with 283 t and shows the data used.

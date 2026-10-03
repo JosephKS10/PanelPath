@@ -1,0 +1,29 @@
+# Render Blueprint for the "Ask the data" chat server (New > Blueprint in the Render dashboard).
+# The site itself is static and deploys separately on Netlify (netlify.toml).
+services:
+  - type: web
+    name: panelpath-chat
+    runtime: node
+    plan: free            # sleeps when idle; the first question after a pause can take up to a minute
+    region: singapore     # closest Render region to Australia
+    buildCommand: cd server && npm ci
+    startCommand: node server/src/server.js   # run from the repo root so it can read web/public/data
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: ANTHROPIC_API_KEY
+        sync: false       # paste in the dashboard; never commit it
+      - key: ALLOWED_ORIGINS
+        sync: false       # your Netlify site, e.g. https://panelpath.netlify.app
+      - key: CHAT_MODEL
+        value: claude-sonnet-5-5
+      - key: RATE_PER_MINUTE
+        value: "6"
+      - key: RATE_PER_DAY
+        value: "40"
+      - key: DAILY_CAP
+        value: "400"
+      - key: CHAT_ENABLED
+        value: "true"

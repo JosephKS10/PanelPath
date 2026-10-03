@@ -12,7 +12,7 @@ About 290 spoken words, at roughly 145 words a minute. Record the browser at 136
 
 ## Recording checklist
 
-- Open https://josephks10.github.io/PanelPath/, or run `cd web && npm run dev`.
+- Open the deployed Netlify site, or run `cd web && npm run dev`. If you show the chat, open the Render `/health` URL a minute before recording, since the free plan sleeps.
 - Wait for the map tiles to load before you start recording.
 - Run the play animation once beforehand, so the tiles are cached and the wave plays smoothly.
 - Keep the cursor still while you talk, and move it only when you click.

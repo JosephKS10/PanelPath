@@ -3,6 +3,7 @@ import { fmt, fmtSig, fmtT, loadData, SCENARIO_LABEL, SCENARIOS, type Data, type
 import MapView, { quantileBreaks, RAMP, shadeValues, SITE_COLOR, type Metric } from "./MapView";
 import Panel, { type Selection } from "./Panel";
 import { MethodPage, ValidationPage } from "./Pages";
+import Chat from "./Chat";
 
 const PAGES = [["map", "Map"], ["validation", "Validation"], ["method", "Method and sources"]] as const;
 type Page = (typeof PAGES)[number][0];
@@ -76,7 +77,9 @@ export default function App() {
     );
   }
 
-  const national = Object.values(data.retirements[scenario][String(year)] ?? {}).reduce((a, b) => a + b, 0);
+  // Exact national series from the pipeline (validation.json), the same figure the validation page and the chat use.
+  const series = data.validation.series[scenario];
+  const national = series.tonnes[series.years.indexOf(year)] ?? 0;
   const cov = data.coverage[scenario];
   const { radius_km, demand_years } = data.coverage.settings;
   const beta = (s: Scenario) => data.assumptions.scenarios.find((x) => x.name === s)?.beta;
@@ -190,6 +193,7 @@ export default function App() {
         <MapView data={data} scenario={scenario} year={year} values={byYear[String(year)] ?? {}} breaks={breaks}
           selection={selection} onSelect={setSelection} focus={focus} />
         {selection && <Panel data={data} scenario={scenario} year={year} selection={selection} onSelect={setSelection} />}
+        <Chat scenario={scenario} year={year} postcode={selection?.kind === "poa" ? selection.code : null} />
       </main>
     </div>
   );
